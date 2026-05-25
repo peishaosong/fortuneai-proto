@@ -955,3 +955,38 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* ─── Typing Indicator ─── */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a853, #b8860b);
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Bubble text overflow fixes */
+.bubble-ai, .bubble-user {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Bubble overflow fixes */
+.bubble-ai, .bubble-user {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.chat-root .flex { max-width: 100%; }

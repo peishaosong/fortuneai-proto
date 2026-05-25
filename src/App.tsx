@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { BaZiInputCard } from './components/BaZiInputCard';
+import { NameInputCard } from './components/names/NameInputCard';
+import { NameResult } from './components/names/NameResult';
 import { ChatBubble } from './components/ChatBubble';
 import { MingPan } from './components/MingPan';
-import { MessageInput } from './components/MessageInput';
+import { MessageInput, TypingIndicator } from './components/MessageInput';
 import { AccessGate } from './components/AccessGate';
 import type { FateReport, ChatMessage } from './types';
 
 const API_BASE = '/api';
+
+type View = 'entry' | 'bazi' | 'names';
 
 async function fetchBaZiReport(date: string, time: string, gender: '男' | '女'): Promise<any> {
   const resp = await fetch(`${API_BASE}/bazi`, {
@@ -28,6 +32,17 @@ async function fetchChat(message: string, birthInfo?: any, baziData?: any): Prom
   const data = await resp.json();
   if (!data.success) return data.reply || '☯ 服务器繁忙...';
   return data.reply;
+}
+
+async function fetchNameAnalysis(name: string, gender: '男' | '女'): Promise<any> {
+  const resp = await fetch(`${API_BASE}/names`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, gender }),
+  });
+  const data = await resp.json();
+  if (!data.success) throw new Error(data.detail || 'API error');
+  return data.data;
 }
 
 function convertToFateReport(apiData: any): FateReport {
@@ -118,7 +133,6 @@ function AtmosphericBg() {
 }
 
 function StarField() {
-  // Generate deterministic "random" stars based on index
   const stars = Array.from({ length: 80 }, (_, i) => {
     const x = ((i * 137.508) % 100);
     const y = ((i * 73.254) % 100);
@@ -149,14 +163,24 @@ function StarField() {
 }
 
 // ─── Header ───
-function AppHeader() {
+function AppHeader({ onBack, showBack }: { onBack?: () => void; showBack?: boolean }) {
   return (
     <header className="app-header">
-      <div className="app-logo">
-        <div className="app-logo-icon">☯</div>
-        <div className="app-logo-text">
-          <span className="app-logo-name">FortuneAI</span>
-          <span className="app-logo-badge">AI</span>
+      <div className="flex items-center gap-3">
+        {showBack && onBack && (
+          <button
+            onClick={onBack}
+            className="w-8 h-8 rounded-full bg-gray-800/50 border border-amber-700/30 flex items-center justify-center text-amber-400 hover:bg-amber-900/30 transition-all text-sm"
+          >
+            ←
+          </button>
+        )}
+        <div className="app-logo">
+          <div className="app-logo-icon">☯</div>
+          <div className="app-logo-text">
+            <span className="app-logo-name">FortuneAI</span>
+            <span className="app-logo-badge">AI</span>
+          </div>
         </div>
       </div>
     </header>
@@ -164,10 +188,17 @@ function AppHeader() {
 }
 
 // ─── Entry Page ───
-function EntryPage({ onSubmit }: { onSubmit: (data: { date: string; time: string; gender: '男' | '女' }) => void }) {
+function EntryPage({
+  onBaZiSubmit,
+  onNamesSubmit,
+}: {
+  onBaZiSubmit: (data: { date: string; time: string; gender: '男' | '女' }) => void;
+  onNamesSubmit: (data: { name: string; gender: '男' | '女' }) => void;
+}) {
   return (
     <div className="entry-root">
-      <BaZiInputCard onSubmit={onSubmit} />
+      <BaZiInputCard onSubmit={onBaZiSubmit} />
+      <NameInputCard onSubmit={onNamesSubmit} />
 
       {/* Bottom tagline */}
       <p className="entry-tagline">
@@ -181,7 +212,8 @@ function EntryPage({ onSubmit }: { onSubmit: (data: { date: string; time: string
 function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentReport, setCurrentReport] = useState<FateReport | null>(null);
-  const [baziData, setBaziData] = useState<any>(null);
+  const [currentView, setCurrentView] = useState<View>('entry');
+  const [nameResult, setNameResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -189,15 +221,22 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleBack = () => {
+    setCurrentView('entry');
+    setMessages([]);
+    setCurrentReport(null);
+    setNameResult(null);
+  };
+
   const handleBaZiSubmit = async (data: { date: string; time: string; gender: '男' | '女' }) => {
-    setMessages([{ id: 'loading', role: 'ai', content: '☯ 正在排盘分析...', timestamp: new Date() }]);
+    setCurrentView('bazi');
+    setMessages([{ id: 'loading', role: 'ai', content: '☯ 正在排盘分析，请稍候...', timestamp: new Date() }]);
     setIsLoading(true);
 
     try {
       const apiData = await fetchBaZiReport(data.date, data.time, data.gender);
       const report = convertToFateReport(apiData);
       setCurrentReport(report);
-      setBaziData(apiData);
 
       setMessages([
         { id: Date.now().toString(), role: 'ai', content: '命盘已生成，继续追问。', timestamp: new Date(), report },
@@ -210,6 +249,19 @@ function App() {
       ]);
     } catch {
       setMessages([{ id: (Date.now() + 1).toString(), role: 'ai', content: '☯ 排盘失败，请稍后重试。', timestamp: new Date() }]);
+    }
+    setIsLoading(false);
+  };
+
+  const handleNamesSubmit = async (data: { name: string; gender: '男' | '女' }) => {
+    setCurrentView('names');
+    setIsLoading(true);
+
+    try {
+      const result = await fetchNameAnalysis(data.name, data.gender);
+      setNameResult(result);
+    } catch {
+      setNameResult(null);
     }
     setIsLoading(false);
   };
@@ -227,7 +279,7 @@ function App() {
           time: currentReport.birthInfo.time,
           gender: currentReport.birthInfo.gender,
         } : undefined,
-        baziData || undefined
+        currentReport ? { ba_zi: { year: { stem: currentReport.baZi.year.stem, branch: currentReport.baZi.year.branch, hidden: currentReport.baZi.year.hidden }, month: { stem: currentReport.baZi.month.stem, branch: currentReport.baZi.month.branch, hidden: currentReport.baZi.month.hidden }, day: { stem: currentReport.baZi.day.stem, branch: currentReport.baZi.day.branch, hidden: currentReport.baZi.day.hidden }, hour: { stem: currentReport.baZi.hour.stem, branch: currentReport.baZi.hour.branch, hidden: currentReport.baZi.hour.hidden } }, wu_xing: currentReport.wuXing, day_master: { stem: currentReport.dayMaster.stem, element: currentReport.dayMaster.element, strength: currentReport.dayMaster.strength }, gods: currentReport.gods, da_yun: currentReport.daYun } : undefined
       );
       setMessages((prev) => [...prev, { id: (Date.now() + 1).toString(), role: 'ai', content: reply, timestamp: new Date() }]);
     } catch {
@@ -243,12 +295,24 @@ function App() {
         <AtmosphericBg />
 
         {/* Header overlay */}
-        <AppHeader />
+        <AppHeader onBack={handleBack} showBack={currentView !== 'entry'} />
 
         {/* Main content */}
         <main className="app-main">
-          {messages.length === 0 ? (
-            <EntryPage onSubmit={handleBaZiSubmit} />
+          {currentView === 'entry' ? (
+            <EntryPage onBaZiSubmit={handleBaZiSubmit} onNamesSubmit={handleNamesSubmit} />
+          ) : currentView === 'names' ? (
+            <div className="chat-root">
+              {isLoading ? (
+                <div className="flex justify-center items-center py-20">
+                  <div className="text-amber-400/70 text-sm animate-pulse">☯ 姓名解析中...</div>
+                </div>
+              ) : nameResult ? (
+                <NameResult name={nameResult.name} score={nameResult} />
+              ) : (
+                <div className="text-center text-gray-500 py-20">解析失败，请返回重试</div>
+              )}
+            </div>
           ) : (
             <div className="chat-root">
               {messages.map((msg) => (
@@ -257,13 +321,25 @@ function App() {
                   {msg.report && <MingPan report={msg.report} />}
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start animate-fade-in">
+                  <div className="bubble-ai rounded-2xl px-4 py-3 max-w-[85%]">
+                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-amber-900/20">
+                      <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center text-xs">☯</div>
+                      <span className="text-xs text-amber-400/80 font-medium">FortuneAI</span>
+                    </div>
+                    <TypingIndicator />
+                    <div className="text-xs text-amber-500/60 mt-2">☯ AI分析中，请稍候...</div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}
         </main>
 
         {/* Bottom input */}
-        {messages.length > 0 && (
+        {currentView === 'bazi' && messages.length > 0 && (
           <div className="app-input-bar">
             <div className="app-input-inner">
               <MessageInput onSend={handleSendMessage} disabled={isLoading} />

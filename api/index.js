@@ -95,7 +95,7 @@ async function callLLM(messages) {
       },
       body: JSON.stringify({
         model: 'MiniMax-M2.7',
-        max_tokens: 1200,
+        max_tokens: 3000,
         messages
       })
     });
@@ -116,6 +116,7 @@ async function callLLM(messages) {
   }
 }
 
+import { analyzeName } from './names.js';
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -209,6 +210,22 @@ export default async function handler(req, res) {
     console.log('[CHAT] reply:', reply ? reply.substring(0, 100) : 'NONE');
     return res.json({success: true, reply, intent: 'bazi'});
   }
+
+  if (path === '/api/names') {
+    const body = req.body || {};
+    const name = (body.name || '').trim();
+    const gender = body.gender || '男';
+    if (!name || name.length < 2) {
+      return res.json({ success: false, detail: '姓名至少需要2个字符' });
+    }
+    try {
+      const result = analyzeName(name, gender);
+      return res.json({ success: true, data: result });
+    } catch(e) {
+      return res.json({ success: false, detail: '姓名解析失败' });
+    }
+  }
+
 
   return res.json({success: false, detail: 'Not found'});
 }

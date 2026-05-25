@@ -29,10 +29,19 @@ function formatRelativeTime(date: Date): string {
 export function ChatBubble({ message }: ChatBubbleProps) {
   const isUser = message.role === 'user';
 
+  // Escape HTML, then apply markdown-like formatting
+  const content = message.content
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-200">$1</strong>')
+    .replace(/\n/g, '<br/>');
+
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`}>
       <div
-        className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+        className={`max-w-[90%] rounded-2xl px-4 py-3 ${
           isUser ? 'bubble-user bubble-decor-line-user' : 'bubble-ai bubble-decor-line-ai'
         }`}
         style={{
@@ -53,10 +62,8 @@ export function ChatBubble({ message }: ChatBubbleProps) {
         )}
 
         <div
-          className={`text-sm leading-relaxed ${isUser ? 'text-gray-200' : 'text-gray-200'}`}
-          dangerouslySetInnerHTML={{
-            __html: message.content.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-200">$1</strong>'),
-          }}
+          className={`text-sm leading-relaxed text-gray-200 break-words`}
+          dangerouslySetInnerHTML={{ __html: content }}
         />
 
         <div className={`text-xs mt-2 flex items-center gap-1 ${isUser ? 'text-emerald-600/60' : 'text-gray-600'}`}>
