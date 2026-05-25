@@ -4,9 +4,10 @@ import { BaZiInputCard } from './components/BaZiInputCard';
 import { ChatBubble } from './components/ChatBubble';
 import { MingPan } from './components/MingPan';
 import { MessageInput } from './components/MessageInput';
-import type { FateReport, ChatMessage, FateFeature, WuXing } from './types';
+import { AccessGate } from './components/AccessGate';
+import type { FateReport, ChatMessage, FateFeature } from './types';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // 调用后端API获取八字命盘
 async function fetchBaZiReport(date: string, time: string, gender: '男' | '女'): Promise<any> {
@@ -99,7 +100,7 @@ function convertToFateReport(apiData: any): FateReport {
       body: palace?.body || '夫妻宫',
       embryo: palace?.embryo || '',
     },
-  } as FateReport;
+  } as unknown as FateReport;
 }
 
 const featureTitles: Record<FateFeature, { title: string; desc: string }> = {
@@ -250,6 +251,7 @@ function App() {
   };
 
   return (
+    <AccessGate>
     <div className="min-h-screen bg-[#0a0e1a] flex flex-col">
       <Header activeFeature={activeFeature} onFeatureChange={setActiveFeature} />
 
@@ -297,6 +299,7 @@ function App() {
       {/* 底部装饰 */}
       <div className="fixed bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-900/30 to-transparent pointer-events-none" />
     </div>
+    </AccessGate>
   );
 }
 

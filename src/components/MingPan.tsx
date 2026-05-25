@@ -90,11 +90,11 @@ function WuXingBars({ wuXing }: { wuXing: WuXing }) {
           const value = wuXing[el as keyof WuXing];
           const percentage = (value / total) * 100;
           const isMax = value === maxVal;
-          const isMin = value === minVal;
+          const _isMin = value === minVal;
 
           return (
             <div key={el} className="flex items-center gap-2.5">
-              <span className={`w-5 text-xs font-medium ${elementColors[el]}`}>{el}</span>
+              <span className={`w-5 text-xs font-medium ${elementColors[el]}`}>{el}{_isMin ? " ◀最弱" : ""}</span>
               <div className="flex-1 h-2.5 bg-gray-900/60 rounded-full overflow-hidden"
                 style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.4)' }}>
                 <div
@@ -186,35 +186,35 @@ export function MingPan({ report }: MingPanProps) {
         <div className="grid grid-cols-4 gap-3">
           <PillarCard
             label="年"
-            stem={baZi.yearPillar.stem}
-            branch={baZi.yearPillar.branch}
-            stemElement={baZi.yearPillar.stemElement}
-            branchElement={baZi.yearPillar.branchElement}
-            hiddenStems={baZi.yearPillar.stemHidden}
+            stem={baZi.year.stem}
+            branch={baZi.year.branch}
+            stemElement={baZi.year.stemElement}
+            branchElement={baZi.year.branchElement}
+            hiddenStems={baZi.year.hidden}
           />
           <PillarCard
             label="月"
-            stem={baZi.monthPillar.stem}
-            branch={baZi.monthPillar.branch}
-            stemElement={baZi.monthPillar.stemElement}
-            branchElement={baZi.monthPillar.branchElement}
-            hiddenStems={baZi.monthPillar.stemHidden}
+            stem={baZi.month.stem}
+            branch={baZi.month.branch}
+            stemElement={baZi.month.stemElement}
+            branchElement={baZi.month.branchElement}
+            hiddenStems={baZi.month.hidden}
           />
           <PillarCard
             label="日"
-            stem={baZi.dayPillar.stem}
-            branch={baZi.dayPillar.branch}
-            stemElement={baZi.dayPillar.stemElement}
-            branchElement={baZi.dayPillar.branchElement}
-            hiddenStems={baZi.dayPillar.stemHidden}
+            stem={baZi.day.stem}
+            branch={baZi.day.branch}
+            stemElement={baZi.day.stemElement}
+            branchElement={baZi.day.branchElement}
+            hiddenStems={baZi.day.hidden}
           />
           <PillarCard
             label="时"
-            stem={baZi.hourPillar.stem}
-            branch={baZi.hourPillar.branch}
-            stemElement={baZi.hourPillar.stemElement}
-            branchElement={baZi.hourPillar.branchElement}
-            hiddenStems={baZi.hourPillar.stemHidden}
+            stem={baZi.hour.stem}
+            branch={baZi.hour.branch}
+            stemElement={baZi.hour.stemElement}
+            branchElement={baZi.hour.branchElement}
+            hiddenStems={baZi.hour.hidden}
           />
         </div>
       </div>

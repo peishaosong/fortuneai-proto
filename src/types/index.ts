@@ -1,10 +1,10 @@
 // 八字相关类型
 
 export interface BaZi {
-  yearPillar: Pillar;
-  monthPillar: Pillar;
-  dayPillar: Pillar;
-  hourPillar: Pillar;
+  year: Pillar;
+  month: Pillar;
+  day: Pillar;
+  hour: Pillar;
 }
 
 export interface Pillar {
@@ -12,15 +12,15 @@ export interface Pillar {
   branch: string; // 地支
   stemElement: string;
   branchElement: string;
-  stemHidden: string[]; // 地支藏干
+  hidden: string[]; // 地支藏干
 }
 
 export interface WuXing {
-  金: number;
   木: number;
-  水: number;
   火: number;
   土: number;
+  金: number;
+  水: number;
 }
 
 export interface FateReport {
@@ -32,8 +32,22 @@ export interface FateReport {
   };
   baZi: BaZi;
   wuXing: WuXing;
+  dayMaster: {
+    stem: string;
+    element: string;
+    strength: string;
+  };
+  gods: {
+    useful: string[];
+    avoid: string[];
+  };
   daYun: DaYun[];
-  message: string;
+  palace: {
+    life: string;
+    body: string;
+    embryo: string;
+  };
+  message?: string;
 }
 
 export interface DaYun {
