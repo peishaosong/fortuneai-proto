@@ -1,152 +1,155 @@
-import type { FateReport, WuXing } from '../types';
+import type { FateReport } from '../types';
 
 interface MingPanProps {
   report: FateReport;
 }
 
-const elementColors: Record<string, string> = {
-  金: 'text-gray-300',
-  木: 'text-green-400',
-  水: 'text-blue-400',
-  火: 'text-red-400',
-  土: 'text-amber-400',
+// 珠宝色调五行颜色
+const elementConfig: Record<string, { color: string; glow: string; gradient: string }> = {
+  木: { color: '#4ade80', glow: '0 0 12px #4ade8066', gradient: 'from-green-600/60 to-green-900/30' },
+  火: { color: '#f87171', glow: '0 0 12px #f8717166', gradient: 'from-red-600/60 to-red-900/30' },
+  土: { color: '#fbbf24', glow: '0 0 12px #fbbf2466', gradient: 'from-amber-600/60 to-amber-900/30' },
+  金: { color: '#e2e8f0', glow: '0 0 12px #e2e8f066', gradient: 'from-gray-300/60 to-gray-700/30' },
+  水: { color: '#60a5fa', glow: '0 0 12px #60a5fa66', gradient: 'from-blue-600/60 to-blue-900/30' },
 };
 
-const elementBarColors: Record<string, string> = {
-  金: 'wuxing-bar-metal',
-  木: 'wuxing-bar-wood',
-  水: 'wuxing-bar-water',
-  火: 'wuxing-bar-fire',
-  土: 'wuxing-bar-earth',
-};
-
-interface PillarCardProps {
-  label: string;
-  stem: string;
-  branch: string;
-  stemElement: string;
-  branchElement: string;
-  hiddenStems?: string[];
-}
-
-function PillarCard({ label, stem, branch, stemElement, branchElement, hiddenStems }: PillarCardProps) {
-  return (
-    <div className="pillar-card rounded-xl p-3 relative">
-      {/* 圆形标签 */}
-      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-        <div className="pillar-label-circle shadow-md">
-          {label}
-        </div>
-      </div>
-
-      {/* 天干 */}
-      <div className="text-center pt-2">
-        <div className="text-xl font-serif text-amber-200 mb-0.5">{stem}</div>
-        <div className={`text-[10px] ${elementColors[stemElement] || 'text-gray-500'} font-medium`}>
-          {stemElement}气
-        </div>
-      </div>
-
-      {/* 分隔线 */}
-      <div className="h-px my-2 mx-1 bg-gradient-to-r from-transparent via-amber-700/40 to-transparent" />
-
-      {/* 地支 */}
-      <div className="text-center pb-2">
-        <div className="text-xl font-serif text-amber-200 mt-1 mb-0.5">{branch}</div>
-        <div className={`text-[10px] ${elementColors[branchElement] || 'text-gray-500'} font-medium`}>
-          {branchElement}支
-        </div>
-      </div>
-
-      {/* 藏干 */}
-      {hiddenStems && hiddenStems.length > 0 && (
-        <div className="mt-1 pt-1.5 border-t border-amber-900/20">
-          <div className="text-[8px] text-amber-700/50 uppercase tracking-wider mb-0.5 text-center">
-            藏干
-          </div>
-          <div className="flex justify-center gap-1">
-            {hiddenStems.map((hs, i) => (
-              <span key={i} className="text-[10px] text-amber-400/70 font-serif">
-                {hs}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function WuXingBars({ wuXing }: { wuXing: WuXing }) {
-  const maxVal = Math.max(...Object.values(wuXing));
-  const minVal = Math.min(...Object.values(wuXing));
-  const total = Object.values(wuXing).reduce((a, b) => a + b, 0);
+function PillarCard({ label, stem, branch, stemEl, branchEl, hidden }: {
+  label: string; stem: string; branch: string;
+  stemEl: string; branchEl: string; hidden: string[];
+}) {
+  const stemColor = elementConfig[stemEl]?.color || '#fbbf24';
+  const branchColor = elementConfig[branchEl]?.color || '#fbbf24';
 
   return (
-    <div>
-      <div className="text-xs text-amber-600/70 mb-3 uppercase tracking-wider">五行分布</div>
-      <div className="space-y-2.5">
-        {(['木', '火', '土', '金', '水'] as const).map((el) => {
-          const value = wuXing[el as keyof WuXing];
-          const percentage = (value / total) * 100;
-          const isMax = value === maxVal;
-          const _isMin = value === minVal;
+    <div className="relative flex-1 min-w-0">
+      {/* 标签 */}
+      <div className="text-center mb-1.5">
+        <span className="text-[10px] text-amber-600/70 font-medium tracking-widest uppercase">{label}柱</span>
+      </div>
 
-          return (
-            <div key={el} className="flex items-center gap-2.5">
-              <span className={`w-5 text-xs font-medium ${elementColors[el]}`}>{el}{_isMin ? " ◀最弱" : ""}</span>
-              <div className="flex-1 h-2.5 bg-gray-900/60 rounded-full overflow-hidden"
-                style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.4)' }}>
-                <div
-                  className={`h-full rounded-full transition-all duration-700 ease-out ${elementBarColors[el]}`}
-                  style={{
-                    width: `${percentage}%`,
-                    boxShadow: isMax ? '0 0 6px currentColor' : undefined,
-                  }}
-                />
-              </div>
-              <span className="w-4 text-xs text-gray-500 text-right">{value}</span>
+      {/* 主牌 */}
+      <div className="relative rounded-xl p-3 bg-gradient-to-b from-gray-900/80 to-gray-950/60 border border-amber-800/30 backdrop-blur-sm overflow-hidden">
+        {/* 顶部光带 */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-xl" style={{ background: `linear-gradient(to right, transparent, ${stemColor}88, transparent)` }} />
+
+        {/* 天干 */}
+        <div className="text-center pb-1.5">
+          <div className="text-2xl font-serif font-bold tracking-wide" style={{ color: stemColor, textShadow: `0 0 8px ${stemColor}55` }}>
+            {stem}
+          </div>
+          <div className="text-[9px] mt-0.5 font-medium" style={{ color: stemColor + '99' }}>
+            {stemEl}气
+          </div>
+        </div>
+
+        {/* 分隔 */}
+        <div className="h-px mx-2 bg-gradient-to-r from-transparent via-amber-700/30 to-transparent my-1" />
+
+        {/* 地支 */}
+        <div className="text-center pt-1.5">
+          <div className="text-xl font-serif font-semibold" style={{ color: branchColor, textShadow: `0 0 6px ${branchColor}44` }}>
+            {branch}
+          </div>
+          <div className="text-[9px] mt-0.5 font-medium" style={{ color: branchColor + '99' }}>
+            {branchEl}支
+          </div>
+        </div>
+
+        {/* 藏干 */}
+        {hidden.length > 0 && (
+          <div className="mt-2 pt-1.5 border-t border-amber-900/20">
+            <div className="flex justify-center gap-1.5">
+              {hidden.map((h, i) => {
+                const hColor = elementConfig[h]?.color || '#fbbf24';
+                return (
+                  <span key={i} className="text-[10px] font-serif font-medium px-1 py-0.5 rounded"
+                    style={{ color: hColor + 'cc', background: hColor + '15' }}>
+                    {h}
+                  </span>
+                );
+              })}
             </div>
-          );
-        })}
-      </div>
-      <div className="mt-2 flex gap-3 text-[10px]">
-        <span className="text-amber-400/70">● 最旺：{maxVal}分</span>
-        <span className="text-gray-500">● 最弱：{minVal}分</span>
-      </div>
-    </div>
-  );
-}
-
-function DaYunTimeline({ daYun }: { daYun: FateReport['daYun'] }) {
-  if (!daYun || daYun.length === 0) return null;
-
-  return (
-    <div>
-      <div className="text-xs text-amber-600/70 mb-3 uppercase tracking-wider">大运走势</div>
-      <div className="timeline-container pl-5">
-        {daYun.slice(0, 6).map((d, i) => (
-          <div key={i} className="timeline-item">
-            <div className="flex items-baseline gap-2">
-              <span className="text-xs text-gray-500">{d.age}</span>
-              <span className="text-sm font-serif text-amber-200">{d.year}</span>
-              <span className="text-xs text-amber-500/70 font-serif">
-                {d.stem}{d.branch}
-              </span>
-            </div>
-            <div className="text-[10px] text-gray-500 mt-0.5 ml-14">{d.description}</div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
 }
 
-function ExtraInfoBlock({ label, value }: { label: string; value: string }) {
+function WuXingCircle({ wuXing }: { wuXing: FateReport['wuXing'] }) {
+  const maxEl = Object.entries(wuXing).reduce((a, b) => b[1] > a[1] ? b : a)[0];
+
   return (
-    <div className="extra-info-block">
-      <div className="extra-info-label">{label}</div>
-      <div className="extra-info-value">{value}</div>
+    <div className="p-4 rounded-xl bg-gray-900/40 border border-amber-800/20">
+      <div className="text-[10px] text-amber-600/70 mb-3 uppercase tracking-widest text-center">五行力量</div>
+
+      {/* 圆形五行图 */}
+      <div className="relative flex items-center justify-center" style={{ height: 160 }}>
+        {/* 外圈 */}
+        <div className="absolute inset-0 rounded-full border border-amber-700/10" />
+
+        {/* 木 */}
+        <div className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-serif font-bold border-2"
+            style={{ borderColor: elementConfig['木'].color, color: elementConfig['木'].color, background: elementConfig['木'].color + '18', boxShadow: maxEl === '木' ? elementConfig['木'].glow : 'none' }}>
+            木
+          </div>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: elementConfig['木'].color }}>{wuXing.木}</div>
+        </div>
+
+        {/* 火 */}
+        <div className="absolute top-7 right-2 top-[30%] flex flex-col items-center">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-serif font-bold border-2"
+            style={{ borderColor: elementConfig['火'].color, color: elementConfig['火'].color, background: elementConfig['火'].color + '18', boxShadow: maxEl === '火' ? elementConfig['火'].glow : 'none' }}>
+            火
+          </div>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: elementConfig['火'].color }}>{wuXing.火}</div>
+        </div>
+
+        {/* 土 */}
+        <div className="absolute bottom-4 right-2 flex flex-col items-center">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-serif font-bold border-2"
+            style={{ borderColor: elementConfig['土'].color, color: elementConfig['土'].color, background: elementConfig['土'].color + '18', boxShadow: maxEl === '土' ? elementConfig['土'].glow : 'none' }}>
+            土
+          </div>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: elementConfig['土'].color }}>{wuXing.土}</div>
+        </div>
+
+        {/* 金 */}
+        <div className="absolute bottom-4 left-2 flex flex-col items-center">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-serif font-bold border-2"
+            style={{ borderColor: elementConfig['金'].color, color: elementConfig['金'].color, background: elementConfig['金'].color + '18', boxShadow: maxEl === '金' ? elementConfig['金'].glow : 'none' }}>
+            金
+          </div>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: elementConfig['金'].color }}>{wuXing.金}</div>
+        </div>
+
+        {/* 水 */}
+        <div className="absolute top-7 left-2 top-[30%] flex flex-col items-center">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-serif font-bold border-2"
+            style={{ borderColor: elementConfig['水'].color, color: elementConfig['水'].color, background: elementConfig['水'].color + '18', boxShadow: maxEl === '水' ? elementConfig['水'].glow : 'none' }}>
+            水
+          </div>
+          <div className="text-[10px] font-medium mt-0.5" style={{ color: elementConfig['水'].color }}>{wuXing.水}</div>
+        </div>
+
+        {/* 中心用神 */}
+        <div className="relative z-10 w-14 h-14 rounded-full bg-gradient-to-b from-amber-900/50 to-amber-950/60 border border-amber-600/40 flex flex-col items-center justify-center shadow-lg shadow-amber-900/30">
+          <div className="text-[9px] text-amber-600/60 uppercase tracking-wider">用神</div>
+          <div className="text-sm font-serif font-bold text-amber-200">{(wuXing.木 > wuXing.金 ? '木' : wuXing.火 > wuXing.水 ? '火' : '土')}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InfoStrip({ label, value, el }: { label: string; value: string; el?: string }) {
+  return (
+    <div className="flex-1 min-w-0 text-center px-2 py-2 rounded-lg bg-gray-900/40 border border-amber-800/15">
+      <div className="text-[9px] text-amber-600/60 uppercase tracking-wider mb-0.5">{label}</div>
+      <div className="text-sm font-serif font-medium text-amber-200" style={el ? { color: elementConfig[el]?.color } : {}}>
+        {value}
+      </div>
     </div>
   );
 }
@@ -154,85 +157,93 @@ function ExtraInfoBlock({ label, value }: { label: string; value: string }) {
 export function MingPan({ report }: MingPanProps) {
   const { baZi, wuXing, daYun, birthInfo, message } = report;
 
-  // 模拟附加信息（实际项目中应从API获取）
-  const extraInfo = {
-    命宫: '迁移宫',
-    胎元: '甲子',
-    身宫: '夫妻宫',
-  };
-
   return (
     <div className="fate-card rounded-2xl p-5 animate-fade-in">
-      {/* 标题 */}
-      <div className="text-center mb-5">
-        <h3 className="font-serif text-lg text-amber-200 mb-1">命盘解析</h3>
-        <div className="yin-yang-divider">
-          <span className="yin-yang-divider-icon">☯</span>
+      {/* 头部信息 */}
+      <div className="text-center mb-4">
+        <h3 className="font-serif text-base text-amber-200">命盘解析</h3>
+        <div className="flex items-center justify-center gap-2 mt-1">
+          <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-700/40" />
+          <span className="text-[10px] text-gray-500">{birthInfo.date} · {birthInfo.time} · {birthInfo.gender}命</span>
+          <div className="h-px w-8 bg-gradient-to-l from-transparent to-amber-700/40" />
         </div>
-        <p className="text-xs text-gray-500">
-          {birthInfo.date} {birthInfo.time} · {birthInfo.gender}命
-        </p>
       </div>
 
-      {/* 附加信息区块 */}
-      <div className="grid grid-cols-3 gap-2 mb-5">
-        <ExtraInfoBlock label="命宫" value={extraInfo.命宫} />
-        <ExtraInfoBlock label="胎元" value={extraInfo.胎元} />
-        <ExtraInfoBlock label="身宫" value={extraInfo.身宫} />
+      {/* 基本信息条 */}
+      <div className="flex gap-2 mb-4">
+        <InfoStrip label="日主" value={baZi.day.stem} el={baZi.day.stemElement} />
+        <InfoStrip label="命宫" value="迁移宫" />
+        <InfoStrip label="身宫" value="夫妻宫" />
+        <InfoStrip label="旺衰" value={wuXing.木 >= 3 ? '偏旺' : '中和'} />
       </div>
 
-      {/* 四柱排盘 */}
-      <div className="mb-5">
-        <div className="grid grid-cols-4 gap-3">
+      {/* 四柱 + 五行 横向并排 */}
+      <div className="flex gap-3 mb-4">
+        {/* 四柱 */}
+        <div className="flex-1 grid grid-cols-4 gap-2">
           <PillarCard
             label="年"
             stem={baZi.year.stem}
             branch={baZi.year.branch}
-            stemElement={baZi.year.stemElement}
-            branchElement={baZi.year.branchElement}
-            hiddenStems={baZi.year.hidden}
+            stemEl={baZi.year.stemElement}
+            branchEl={baZi.year.branchElement}
+            hidden={baZi.year.hidden}
           />
           <PillarCard
             label="月"
             stem={baZi.month.stem}
             branch={baZi.month.branch}
-            stemElement={baZi.month.stemElement}
-            branchElement={baZi.month.branchElement}
-            hiddenStems={baZi.month.hidden}
+            stemEl={baZi.month.stemElement}
+            branchEl={baZi.month.branchElement}
+            hidden={baZi.month.hidden}
           />
           <PillarCard
             label="日"
             stem={baZi.day.stem}
             branch={baZi.day.branch}
-            stemElement={baZi.day.stemElement}
-            branchElement={baZi.day.branchElement}
-            hiddenStems={baZi.day.hidden}
+            stemEl={baZi.day.stemElement}
+            branchEl={baZi.day.branchElement}
+            hidden={baZi.day.hidden}
           />
           <PillarCard
             label="时"
             stem={baZi.hour.stem}
             branch={baZi.hour.branch}
-            stemElement={baZi.hour.stemElement}
-            branchElement={baZi.hour.branchElement}
-            hiddenStems={baZi.hour.hidden}
+            stemEl={baZi.hour.stemElement}
+            branchEl={baZi.hour.branchElement}
+            hidden={baZi.hour.hidden}
           />
+        </div>
+
+        {/* 五行圆图 */}
+        <div className="w-44 flex-shrink-0">
+          <WuXingCircle wuXing={wuXing} />
         </div>
       </div>
 
-      {/* 五行分析 */}
-      <div className="mb-5 p-4 rounded-xl bg-gray-900/30 border border-amber-900/15">
-        <WuXingBars wuXing={wuXing} />
-      </div>
+      {/* 大运 */}
+      {daYun && daYun.length > 0 && (
+        <div className="mb-4 p-3 rounded-xl bg-gray-900/30 border border-amber-800/15">
+          <div className="text-[10px] text-amber-600/70 mb-2 uppercase tracking-widest">大运走势</div>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {daYun.slice(0, 5).map((d, i) => (
+              <div key={i} className="flex-shrink-0 text-center px-3 py-2 rounded-lg bg-gray-900/50 border border-amber-800/10">
+                <div className="text-[9px] text-gray-500">{d.age}岁</div>
+                <div className="text-sm font-serif text-amber-200 mt-0.5">{d.stem}{d.branch}</div>
+                <div className="text-[9px] text-gray-500 mt-0.5">{d.year}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* 大运流年 */}
-      <div className="mb-4 p-4 rounded-xl bg-gray-900/30 border border-amber-900/15">
-        <DaYunTimeline daYun={daYun} />
-      </div>
-
-      {/* AI分析文字 */}
-      <div className="pt-4 border-t border-amber-900/20">
-        <p className="text-xs text-gray-400 leading-relaxed">{message}</p>
-      </div>
+      {/* AI解读 */}
+      {message && (
+        <div className="p-3 rounded-xl bg-gradient-to-b from-amber-950/30 to-amber-950/10 border border-amber-800/20">
+          <div className="text-[9px] text-amber-600/60 mb-1.5 uppercase tracking-widest">☯ 命理解读</div>
+          <p className="text-xs text-gray-300 leading-relaxed">{message}</p>
+        </div>
+      )}
     </div>
   );
 }

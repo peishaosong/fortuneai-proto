@@ -1,48 +1,699 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Space+Grotesk:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap');
 
 :root {
   --color-ink: #0a0e1a;
-  --color-ink-light: #111827;
   --color-gold: #c9a84c;
   --color-gold-light: #e8d5a3;
+  --color-gold-dim: rgba(201, 168, 76, 0.35);
   --color-cream: #f5f0e6;
   --color-jade: #4a7c59;
   --color-ruby: #8b2942;
+  --glass-bg: rgba(10, 14, 26, 0.72);
+  --glass-border: rgba(201, 168, 76, 0.18);
+  --glass-glow: rgba(201, 168, 76, 0.08);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Noto Sans SC', sans-serif;
   background-color: var(--color-ink);
   color: var(--color-cream);
-  min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-.font-serif {
+.font-serif { font-family: 'Noto Serif SC', serif; }
+.font-sans  { font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif; }
+
+/* ════════════════════════════════════════════
+   ATMOSPHERIC BACKGROUND
+   ════════════════════════════════════════════ */
+.app-root {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.atmospheric-root {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #060810;
+}
+
+/* Gradient layers */
+.atmospheric-layer-1 {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, #0d1535 0%, transparent 65%),
+              radial-gradient(ellipse 80% 60% at 0% 100%, #0f1a2e 0%, transparent 55%),
+              radial-gradient(ellipse 60% 50% at 100% 80%, #12101f 0%, transparent 55%);
+}
+
+.atmospheric-layer-2 {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 40% at 20% 20%, rgba(30, 50, 100, 0.35) 0%, transparent 60%),
+              radial-gradient(ellipse 40% 35% at 80% 70%, rgba(50, 30, 80, 0.25) 0%, transparent 55%);
+}
+
+.atmospheric-layer-3 {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 8, 16, 0.0) 0%, rgba(6, 8, 16, 0.6) 100%);
+}
+
+/* Glowing orbs */
+.atmospheric-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.atmospheric-orb--1 {
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  left: -100px;
+  background: radial-gradient(circle, rgba(40, 60, 160, 0.18) 0%, transparent 70%);
+  animation: orbFloat1 18s ease-in-out infinite;
+}
+
+.atmospheric-orb--2 {
+  width: 400px;
+  height: 400px;
+  bottom: -100px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(100, 40, 80, 0.15) 0%, transparent 70%);
+  animation: orbFloat2 22s ease-in-out infinite;
+}
+
+.atmospheric-orb--3 {
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(201, 168, 76, 0.06) 0%, transparent 70%);
+  animation: orbFloat3 15s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0); }
+  33%       { transform: translate(30px, 20px); }
+  66%       { transform: translate(-20px, 40px); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0); }
+  40%       { transform: translate(-30px, -20px); }
+  70%       { transform: translate(20px, -40px); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Star field */
+.starfield {
+  position: absolute;
+  inset: 0;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: starTwinkle 4s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: inherit; transform: scale(1); }
+  50%       { opacity: 0.2;   transform: scale(0.6); }
+}
+
+/* Subtle TaiJi watermark */
+.atmospheric-taiji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%,
+      transparent 46%,
+      rgba(201, 168, 76, 0.015) 47%,
+      rgba(201, 168, 76, 0.015) 49%,
+      transparent 50%
+    ),
+    radial-gradient(circle at 50% 50%,
+      transparent 24%,
+      rgba(201, 168, 76, 0.008) 25%,
+      rgba(201, 168, 76, 0.008) 26%,
+      transparent 27%
+    );
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════
+   HEADER
+   ════════════════════════════════════════════ */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 1rem 1.5rem;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.app-logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(201, 168, 76, 0.25), rgba(201, 168, 76, 0.08));
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: var(--color-gold-light);
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+}
+
+.app-logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.app-logo-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-gold-light);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+}
+
+.app-logo-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  background: rgba(201, 168, 76, 0.15);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  color: var(--color-gold);
+  text-transform: uppercase;
+}
+
+/* ════════════════════════════════════════════
+   MAIN CONTENT AREA
+   ════════════════════════════════════════════ */
+.app-main {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1rem 2rem;
+  min-height: 100dvh;
+}
+
+/* ════════════════════════════════════════════
+   ENTRY PAGE
+   ════════════════════════════════════════════ */
+.entry-root {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.entry-tagline {
   font-family: 'Noto Serif SC', serif;
+  font-size: 0.85rem;
+  color: rgba(201, 168, 76, 0.3);
+  letter-spacing: 0.2em;
+  text-align: center;
 }
 
-/* 命理金边框效果 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════════
+   FATE PORTAL CARD (glassmorphism)
+   ════════════════════════════════════════════ */
+.fate-portal {
+  position: relative;
+  width: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 3rem 3rem 2.5rem;
+  box-shadow:
+    0 0 0 1px rgba(201, 168, 76, 0.06) inset,
+    0 8px 48px rgba(0, 0, 0, 0.6),
+    0 2px 8px rgba(0, 0, 0, 0.4),
+    0 0 60px rgba(201, 168, 76, 0.05),
+    0 0 120px rgba(201, 168, 76, 0.03);
+}
+
+/* Outer rim glow */
+.portal-glow-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 29px;
+  background: linear-gradient(135deg,
+    rgba(201, 168, 76, 0.2) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(201, 168, 76, 0.08) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Corner accents */
+.portal-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.portal-corner--tl { top: 12px;  left: 12px;
+  border-top: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-left: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-radius: 6px 0 0 0;
+}
+.portal-corner--tr { top: 12px;  right: 12px;
+  border-top: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-right: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-radius: 0 6px 0 0;
+}
+.portal-corner--bl { bottom: 12px; left: 12px;
+  border-bottom: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-left: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-radius: 0 0 0 6px;
+}
+.portal-corner--br { bottom: 12px; right: 12px;
+  border-bottom: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-right: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-radius: 0 0 6px 0;
+}
+
+/* ─── Header ─── */
+.portal-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.portal-yin-yang {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5));
+  animation: portalYinYangSpin 20s linear infinite;
+}
+
+@keyframes portalYinYangSpin {
+  from { filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5)) hue-rotate(0deg); }
+  to   { filter: drop-shadow(0 0 12px rgba(201, 168, 76, 0.5)) hue-rotate(360deg); }
+}
+
+.portal-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--color-gold-light);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.4), 0 2px 4px rgba(0,0,0,0.5);
+  line-height: 1.2;
+}
+
+.portal-subtitle {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: rgba(245, 240, 230, 0.45);
+  margin-top: 0.4rem;
+  letter-spacing: 0.15em;
+}
+
+/* ─── Divider ─── */
+.portal-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.portal-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.25), transparent);
+}
+
+.portal-divider-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  opacity: 0.5;
+  box-shadow: 0 0 8px rgba(201, 168, 76, 0.4);
+}
+
+/* ─── Form Row ─── */
+.portal-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.portal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.portal-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: rgba(201, 168, 76, 0.7);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portal-label-icon {
+  font-size: 0.85rem;
+  filter: grayscale(0.3);
+}
+
+/* ─── Inputs ─── */
+.portal-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 1rem;
+  background: rgba(6, 8, 20, 0.8);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  border-radius: 14px;
+  color: var(--color-cream);
+  font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.portal-input::placeholder {
+  color: rgba(245, 240, 230, 0.25);
+}
+
+.portal-input:hover {
+  border-color: rgba(201, 168, 76, 0.3);
+  background: rgba(6, 8, 20, 0.95);
+}
+
+.portal-input:focus {
+  border-color: rgba(201, 168, 76, 0.55);
+  background: rgba(6, 8, 20, 0.95);
+  box-shadow:
+    0 0 0 3px rgba(201, 168, 76, 0.08),
+    0 0 20px rgba(201, 168, 76, 0.1);
+}
+
+.portal-input-date {
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+/* Date input icon / calendar */
+.portal-input-date::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(1) saturate(2) hue-rotate(5deg);
+  cursor: pointer;
+}
+
+/* ─── Select ─── */
+.portal-select-wrapper {
+  position: relative;
+}
+
+.portal-select {
+  cursor: pointer;
+  padding-right: 2.5rem;
+  width: 100%;
+}
+
+.portal-select-arrow {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.6rem;
+  color: rgba(201, 168, 76, 0.5);
+  pointer-events: none;
+}
+
+.portal-option {
+  background: #060810;
+  color: var(--color-cream);
+}
+
+/* ─── Gender Toggle ─── */
+.portal-gender-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  min-height: 52px;
+}
+
+.portal-gender-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 168, 76, 0.15);
+  background: rgba(6, 8, 20, 0.8);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 52px;
+  color: rgba(245, 240, 230, 0.4);
+}
+
+.portal-gender-btn:hover {
+  border-color: rgba(201, 168, 76, 0.3);
+  background: rgba(6, 8, 20, 0.95);
+}
+
+.portal-gender-char {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.portal-gender-pinyin {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* Male active */
+.portal-gender-btn--active-male {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: rgba(201, 168, 76, 0.5);
+  color: var(--color-gold-light);
+  box-shadow: 0 0 20px rgba(201, 168, 76, 0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.portal-gender-btn--active-male .portal-gender-pinyin { opacity: 1; }
+
+/* Female active */
+.portal-gender-btn--active-female {
+  background: rgba(180, 140, 200, 0.12);
+  border-color: rgba(180, 140, 200, 0.5);
+  color: #d4b8e8;
+  box-shadow: 0 0 20px rgba(180, 140, 200, 0.12), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.portal-gender-btn--active-female .portal-gender-pinyin { opacity: 1; }
+
+/* ─── Submit Button ─── */
+.portal-submit-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.portal-submit-btn {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 360px;
+  height: 58px;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  background: linear-gradient(135deg,
+    rgba(201, 168, 76, 0.18) 0%,
+    rgba(201, 168, 76, 0.08) 50%,
+    rgba(201, 168, 76, 0.18) 100%
+  );
+  color: var(--color-gold-light);
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(201, 168, 76, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+}
+
+.portal-submit-btn:hover {
+  background: linear-gradient(135deg,
+    rgba(201, 168, 76, 0.28) 0%,
+    rgba(201, 168, 76, 0.14) 50%,
+    rgba(201, 168, 76, 0.28) 100%
+  );
+  border-color: rgba(201, 168, 76, 0.7);
+  box-shadow:
+    0 6px 32px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(201, 168, 76, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+  text-shadow: 0 0 30px rgba(201, 168, 76, 0.7);
+}
+
+.portal-submit-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(201, 168, 76, 0.12);
+}
+
+.portal-submit-text {
+  letter-spacing: 0.2em;
+}
+
+.portal-submit-arrow {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.6));
+  animation: arrowSpin 4s ease-in-out infinite;
+}
+
+@keyframes arrowSpin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25%       { transform: rotate(90deg) scale(1.1); }
+  50%       { transform: rotate(180deg) scale(1); }
+  75%       { transform: rotate(270deg) scale(1.1); }
+}
+
+/* Shimmer sweep */
+.portal-submit-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  transition: background-position 0.6s ease;
+}
+
+.portal-submit-btn:hover .portal-submit-shimmer {
+  background-position: 200% 0;
+}
+
+/* ════════════════════════════════════════════
+   CHAT & MESSAGE STYLES
+   ════════════════════════════════════════════ */
+.chat-root {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 5rem 1rem 7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.app-input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 1rem 1rem 1.5rem;
+  background: linear-gradient(180deg, transparent 0%, rgba(6, 8, 16, 0.95) 30%);
+}
+
+.app-input-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════════
+   LEGACY STYLES (kept for other components)
+   ════════════════════════════════════════════ */
+
+/* Gold border effect */
 .gold-border {
   border: 1px solid rgba(201, 168, 76, 0.3);
   box-shadow: 0 0 20px rgba(201, 168, 76, 0.08), inset 0 0 20px rgba(201, 168, 76, 0.04);
 }
 
-/* 命理质感卡片 */
+/* Fate card */
 .fate-card {
   background: linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(10, 14, 26, 0.95));
   border: 1px solid rgba(201, 168, 76, 0.2);
   backdrop-filter: blur(10px);
 }
 
-/* 聊天气泡 */
+/* Chat bubbles */
 .bubble-user {
   background: linear-gradient(135deg, #1a2a1a, #0f1f0f);
   border: 1px solid rgba(74, 124, 89, 0.4);
@@ -53,50 +704,42 @@ body {
   border: 1px solid rgba(201, 168, 76, 0.25);
 }
 
-/* 五行颜色 */
-.wu-xing-metal { color: #a8a8a8; }
-.wu-xing-wood { color: #4a7c59; }
-.wu-xing-water { color: #4a6fa5; }
+/* Five element colors — jewel tones */
+.wu-xing-metal { color: #b8c4d0; }
+.wu-xing-wood { color: #4a9e6a; }
+.wu-xing-water { color: #4a7eb5; }
 .wu-xing-fire { color: #c94a4a; }
 .wu-xing-earth { color: #c9a84c; }
 
-/* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.3);
-  border-radius: 2px;
-}
+/* Five element bars — jewel tones */
+.wuxing-bar-metal  { background: linear-gradient(90deg, #8a9aaa, #b8c4d0); }
+.wuxing-bar-wood  { background: linear-gradient(90deg, #3a7e55, #5aae75); }
+.wuxing-bar-water  { background: linear-gradient(90deg, #3a5e8a, #5a8ec5); }
+.wuxing-bar-fire  { background: linear-gradient(90deg, #a93a3a, #c95a5a); }
+.wuxing-bar-earth { background: linear-gradient(90deg, #a9883a, #c9a84a); }
 
-/* 动画 */
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.3); border-radius: 2px; }
+
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 8px rgba(201, 168, 76, 0.3); }
-  50% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.6); }
+  50%       { box-shadow: 0 0 20px rgba(201, 168, 76, 0.6); }
 }
 
-@keyframes cloud-ripple {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
-}
+.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
 
 .shimmer-gold {
   background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.15), transparent);
@@ -104,11 +747,7 @@ body {
   animation: shimmer 3s infinite;
 }
 
-/* ============================================
-   装饰性八字字符样式
-   ============================================ */
-
-/* 天干装饰字符 */
+/* Decorative */
 .stem-decorative {
   font-family: 'Noto Serif SC', serif;
   color: rgba(201, 168, 76, 0.12);
@@ -117,7 +756,6 @@ body {
   user-select: none;
 }
 
-/* 地支装饰字符 */
 .branch-decorative {
   font-family: 'Noto Serif SC', serif;
   color: rgba(201, 168, 76, 0.08);
@@ -125,10 +763,6 @@ body {
   letter-spacing: 0.05em;
   user-select: none;
 }
-
-/* ============================================
-   阴阳分隔线样式
-   ============================================ */
 
 .yin-yang-divider {
   display: flex;
@@ -145,113 +779,9 @@ body {
   background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.4), transparent);
 }
 
-.yin-yang-divider-icon {
-  color: rgba(201, 168, 76, 0.5);
-  font-size: 1rem;
-}
+.yin-yang-divider-icon { color: rgba(201, 168, 76, 0.5); font-size: 1rem; }
 
-/* ============================================
-   移动端字体大小
-   ============================================ */
-
-@media (max-width: 480px) {
-  body {
-    font-size: 14px;
-  }
-
-  .text-sm {
-    font-size: 13px !important;
-  }
-
-  .text-xs {
-    font-size: 11px !important;
-  }
-}
-
-/* ============================================
-   云纹/水波纹背景装饰
-   ============================================ */
-
-.cloud-pattern-bg {
-  position: relative;
-  overflow: hidden;
-}
-
-.cloud-pattern-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(201, 168, 76, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 75% 65%, rgba(201, 168, 76, 0.03) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(201, 168, 76, 0.025) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ============================================
-   金色光晕按钮效果
-   ============================================ */
-
-.btn-gold-glow {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-gold-glow::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: linear-gradient(135deg, rgba(201, 168, 76, 0.3), transparent, rgba(201, 168, 76, 0.3));
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: -1;
-  filter: blur(8px);
-}
-
-.btn-gold-glow:hover::after {
-  opacity: 1;
-}
-
-/* ============================================
-   消息气泡竖线装饰
-   ============================================ */
-
-.bubble-decor-line-ai {
-  position: relative;
-}
-
-.bubble-decor-line-ai::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, transparent, var(--color-gold), transparent);
-  border-radius: 2px 0 0 2px;
-}
-
-.bubble-decor-line-user {
-  position: relative;
-}
-
-.bubble-decor-line-user::before {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, transparent, var(--color-jade), transparent);
-  border-radius: 0 2px 2px 0;
-}
-
-/* ============================================
-   命盘柱子卡片
-   ============================================ */
-
+/* Pillar card */
 .pillar-card {
   background: linear-gradient(145deg, rgba(17, 24, 39, 0.9), rgba(10, 14, 26, 0.95));
   border: 1px solid rgba(201, 168, 76, 0.35);
@@ -271,10 +801,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* ============================================
-   圆形标签
-   ============================================ */
-
 .pillar-label-circle {
   width: 22px;
   height: 22px;
@@ -287,28 +813,10 @@ body {
   font-size: 9px;
   color: var(--color-gold-light);
   font-weight: 600;
-  letter-spacing: 0;
 }
 
-/* ============================================
-   五行柱状图
-   ============================================ */
-
-.wuxing-bar-metal  { background: linear-gradient(90deg, #a8a8a8, #c0c0c0); }
-.wuxing-bar-wood  { background: linear-gradient(90deg, #4a7c59, #6aaf7f); }
-.wuxing-bar-water  { background: linear-gradient(90deg, #4a6fa5, #6a9fd5); }
-.wuxing-bar-fire  { background: linear-gradient(90deg, #c94a4a, #e86a6a); }
-.wuxing-bar-earth { background: linear-gradient(90deg, #c9a84c, #e8c86c); }
-
-/* ============================================
-   大运时间轴
-   ============================================ */
-
-.timeline-container {
-  position: relative;
-  padding-left: 1rem;
-}
-
+/* Timeline */
+.timeline-container { position: relative; padding-left: 1rem; }
 .timeline-container::before {
   content: '';
   position: absolute;
@@ -318,12 +826,7 @@ body {
   width: 2px;
   background: linear-gradient(180deg, transparent, rgba(201, 168, 76, 0.5) 20%, rgba(201, 168, 76, 0.5) 80%, transparent);
 }
-
-.timeline-item {
-  position: relative;
-  margin-bottom: 0.75rem;
-}
-
+.timeline-item { position: relative; margin-bottom: 0.75rem; }
 .timeline-item::before {
   content: '';
   position: absolute;
@@ -337,26 +840,118 @@ body {
   box-shadow: 0 0 6px rgba(201, 168, 76, 0.5);
 }
 
-/* ============================================
-   附加信息区块
-   ============================================ */
-
+/* Extra info block */
 .extra-info-block {
   background: linear-gradient(135deg, rgba(201, 168, 76, 0.05), rgba(201, 168, 76, 0.02));
   border: 1px solid rgba(201, 168, 76, 0.15);
   border-radius: 0.75rem;
   padding: 0.625rem 0.75rem;
 }
-
 .extra-info-label {
   font-size: 10px;
   color: rgba(201, 168, 76, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-
 .extra-info-value {
   font-family: 'Noto Serif SC', serif;
   color: var(--color-cream);
   font-size: 13px;
+}
+
+/* Cloud pattern */
+.cloud-pattern-bg { position: relative; overflow: hidden; }
+.cloud-pattern-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(201, 168, 76, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 75% 65%, rgba(201, 168, 76, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(201, 168, 76, 0.025) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Btn gold glow */
+.btn-gold-glow { position: relative; overflow: hidden; }
+.btn-gold-glow::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.3), transparent, rgba(201, 168, 76, 0.3));
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(8px);
+}
+.btn-gold-glow:hover::after { opacity: 1; }
+
+/* Bubble decorators */
+.bubble-decor-line-ai { position: relative; }
+.bubble-decor-line-ai::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--color-gold), transparent);
+  border-radius: 2px 0 0 2px;
+}
+.bubble-decor-line-user { position: relative; }
+.bubble-decor-line-user::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--color-jade), transparent);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .fate-portal {
+    padding: 2rem 1.5rem 2rem;
+    border-radius: 24px;
+  }
+
+  .portal-title {
+    font-size: 1.8rem;
+  }
+
+  .portal-form-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .portal-submit-btn {
+    height: 54px;
+    font-size: 1rem;
+  }
+
+  .portal-label {
+    font-size: 0.72rem;
+  }
+
+  .app-main {
+    padding: 4.5rem 0.75rem 1.5rem;
+    justify-content: flex-start;
+    padding-top: 6rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .fate-portal {
+    padding: 1.5rem 1rem 1.5rem;
+  }
+
+  .portal-title {
+    font-size: 1.5rem;
+  }
 }
