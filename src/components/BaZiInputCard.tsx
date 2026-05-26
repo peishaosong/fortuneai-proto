@@ -5,15 +5,23 @@ interface BaZiInputCardProps {
 }
 
 const timeOptions = [
-  '子时 (23:00-00:59)', '丑时 (01:00-02:59)', '寅时 (03:00-04:59)',
-  '卯时 (05:00-06:59)', '辰时 (07:00-08:59)', '巳时 (09:00-10:59)',
-  '午时 (11:00-12:59)', '未时 (13:00-14:59)', '申时 (15:00-16:59)',
-  '酉时 (17:00-18:59)', '戌时 (19:00-20:59)', '亥时 (21:00-22:59)',
+  { label: '子时', time: '23:00-00:59' },
+  { label: '丑时', time: '01:00-02:59' },
+  { label: '寅时', time: '03:00-04:59' },
+  { label: '卯时', time: '05:00-06:59' },
+  { label: '辰时', time: '07:00-08:59' },
+  { label: '巳时', time: '09:00-10:59' },
+  { label: '午时', time: '11:00-12:59' },
+  { label: '未时', time: '13:00-14:59' },
+  { label: '申时', time: '15:00-16:59' },
+  { label: '酉时', time: '17:00-18:59' },
+  { label: '戌时', time: '19:00-20:59' },
+  { label: '亥时', time: '21:00-22:59' },
 ];
 
 export function BaZiInputCard({ onSubmit }: BaZiInputCardProps) {
   const [date, setDate] = useState('1990-01-01');
-  const [time, setTime] = useState(timeOptions[0]);
+  const [time, setTime] = useState('子时');
   const [gender, setGender] = useState<'男' | '女'>('男');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -70,10 +78,14 @@ export function BaZiInputCard({ onSubmit }: BaZiInputCardProps) {
                 className="portal-input portal-select"
               >
                 {timeOptions.map((t) => (
-                  <option key={t} value={t} className="portal-option">{t}</option>
+                  <option key={t.label} value={t.label} className="portal-option">{t.label} ({t.time})</option>
                 ))}
               </select>
               <div className="portal-select-arrow">▼</div>
+            </div>
+            {/* 显示时间范围 */}
+            <div className="portal-time-hint">
+              {timeOptions.find(t => t.label === time)?.time}
             </div>
           </div>
 
