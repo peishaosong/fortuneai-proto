@@ -369,12 +369,19 @@ async function apiHandler(req, res) {
     const body = req.body || {};
     const eventType = body.event_type || '';
     const targetDate = body.target_date || '';
+    const zodiac = body.zodiac || '';
     const requirements = body.requirements || '';
 
     // P0: 事件类型校验
     const validEvents = ['marriage','move','business','travel','worship','other'];
     if (!validEvents.includes(eventType)) return errorRes(res, 400, '事项类型有误');
-    if (targetDate && !isValidDateStr(targetDate)) return errorRes(res, 400, '目标日期格式有误');
+    if (targetDate) {
+      if (!isValidDateStr(targetDate)) return errorRes(res, 400, '目标日期格式有误');
+      // 禁止选择今天之前的日期
+      const today = new Date(); today.setHours(0,0,0,0);
+      const selected = new Date(targetDate + 'T00:00:00');
+      if (selected < today) return errorRes(res, 400, '目标日期不能早于今天');
+    }
 
     const eventLabels = {
       marriage:'结婚嫁娶',move:'搬家入宅',business:'开业开市',
@@ -382,13 +389,14 @@ async function apiHandler(req, res) {
     };
     const eventDesc = eventLabels[eventType];
     const dateInfo = targetDate ? `目标日期：${targetDate}` : '请帮我推荐最近适合的吉日';
+    const zodiacInfo = zodiac ? `\n家人属相：${sanitizeMessage(zodiac)}` : '';
     const reqInfo = requirements ? `\n用户要求：${sanitizeMessage(requirements)}` : '';
 
     const prompt = `你是一位资深择日师，精通黄历、彭祖百忌、协纪辨方书。
 
 请为以下事项提供择日建议：
 - 事项类型：${eventDesc}
-- ${dateInfo}${reqInfo}
+- ${dateInfo}${zodiacInfo}${reqInfo}
 
 请直接给出分析，不要问用户补充信息。格式：
 【吉日推荐】给出2-3个推荐日期及理由
@@ -410,6 +418,41 @@ async function apiHandler(req, res) {
       return errorRes(res, 500, '择日服务暂不可用，请稍后再试');
     }
   }
+
+  // ── /api/agent ── 多意图统一入口
+  if (path === '/api/agent') {
+    const body = req.body || {};
+    const message = (body.message || '').trim();
+    if (!message) return errorRes(res, 400, '请输入您的问题');
+    try {
+      const lowerMsg = message.toLowerCase();
+      let intent = 'chat';
+      if (/姓名|名字|五格/i.test(lowerMsg)) intent = 'names';
+      else if (/八字|排盘|命盘|日主|五行|用神|大运/i.test(lowerMsg)) intent = 'bazi';
+      else if (/风水|客厅|卧室|朝向|门|床/i.test(lowerMsg)) intent = 'fengshui';
+      else if (/择日|吉日|结婚|搬家|开业/i.test(lowerMsg)) intent = 'calendar';
+      else if (/签|观音/i.test(lowerMsg)) intent = 'guanyin';
+      
+      let reply = '';
+      switch(intent) {
+        case 'bazi': reply = '请先使用八字排盘功能生成命盘，再进行命盘分析。'; break;
+        case 'names': 
+          const nm = message.match(/[一-龥]+/);
+          if (nm) {
+            const nd = analyzeName(nm[0], '男');
+            const g = nd.grid || {};
+            reply = `${nm[0]}的五格：天${g.tian||0}地${g.di||0}人${g.ren||0}外${g.wai||0}总${g.zong||0}。三才：${nd.talent||'未知'}。`;
+          } else reply = '请提供要分析的姓名。';
+          break;
+        case 'fengshui': reply = '请在风水页面选择房间类型和朝向。'; break;
+        case 'calendar': reply = '请在择日页面选择事项类型。'; break;
+        case 'guanyin': reply = '请在观音灵签页面抽签。'; break;
+        default: reply = '您好！我是FortuneAI命理助手，请问有什么可以帮您？';
+      }
+      return res.json({success:true, intent, agent:intent+'Agent', reply});
+    } catch(e) { console.error('[agent]', e.message); return errorRes(res,500,'服务暂不可用'); }
+  }
+
 
   return res.json({success: false, detail: 'Not found'});
 }

@@ -485,6 +485,14 @@ body {
   pointer-events: none;
 }
 
+.portal-time-hint {
+  font-size: 0.7rem;
+  color: rgba(201, 168, 76, 0.5);
+  text-align: center;
+  padding-top: 0.25rem;
+  letter-spacing: 0.05em;
+}
+
 .portal-option {
   background: #060810;
   color: var(--color-cream);
@@ -915,6 +923,26 @@ body {
 /* ════════════════════════════════════════════
    RESPONSIVE
    ════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  .fate-portal {
+    padding: 3rem 3.5rem 3rem;
+    border-radius: 32px;
+  }
+
+  .portal-form-row {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .portal-title {
+    font-size: 2.2rem;
+  }
+
+  .portal-subtitle {
+    font-size: 0.9rem;
+  }
+}
+
 @media (max-width: 640px) {
   .fate-portal {
     padding: 2rem 1.5rem 2rem;
