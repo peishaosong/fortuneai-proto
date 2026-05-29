@@ -15,6 +15,7 @@
     "@vercel/python": "^6.43.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.3.0",
+    "html2canvas": "^1.4.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "tailwindcss": "^4.3.0",

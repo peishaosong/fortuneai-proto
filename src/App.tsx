@@ -13,6 +13,7 @@ import { SelectDate } from './components/SelectDate';
 import { FengShui } from './components/FengShui';
 import { Guanyin } from './components/Guanyin';
 import { DonationSidebar } from './components/DonationSidebar';
+import { type Lang, tv } from './i18n';
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -46,20 +47,29 @@ function AtmosphericBg() {
   );
 }
 
-const TAB_TITLES: Record<TabId, string> = {
-  report: 'AI运势报告', names: '姓名解析', calendar: '择日吉凶', fengshui: '风水堪舆', guanyin: '观音灵签',
+// ── Lang Context ──
+import { createContext, useContext } from 'react';
+export const LangContext = createContext<Lang>('zh');
+export const useLang = () => useContext(LangContext);
+
+const TAB_TITLES = {
+  report: { zh: 'AI运势报告', en: 'AI Fortune Reading' },
+  names: { zh: '姓名解析', en: 'Name Analysis' },
+  calendar: { zh: '择日吉凶', en: 'Date Selection' },
+  fengshui: { zh: '风水堪舆', en: 'Feng Shui' },
+  guanyin: { zh: '观音灵签', en: 'Guanyin Divination' },
 };
 
-const TABS: { id: TabId; label: string; icon: string }[] = [
-  { id: 'report', label: '运势报告', icon: '📜' },
-  { id: 'names', label: '姓名解析', icon: '✍️' },
-  { id: 'calendar', label: '择日吉凶', icon: '📅' },
-  { id: 'fengshui', label: '风水堪舆', icon: '🏠' },
-  { id: 'guanyin', label: '观音灵签', icon: '🔮' },
+const TABS = [
+  { id: 'report' as TabId, label: { zh: '运势报告', en: 'Fortune Reading' }, icon: '📜' },
+  { id: 'names' as TabId, label: { zh: '姓名解析', en: 'Name Analysis' }, icon: '✍️' },
+  { id: 'calendar' as TabId, label: { zh: '择日吉凶', en: 'Date Selection' }, icon: '📅' },
+  { id: 'fengshui' as TabId, label: { zh: '风水堪舆', en: 'Feng Shui' }, icon: '🏠' },
+  { id: 'guanyin' as TabId, label: { zh: '观音灵签', en: 'Guanyin Divination' }, icon: '🔮' },
 ];
 
 // ─── Mobile Layout ───
-function MobileLayout({ currentTab, onTabChange }: { currentTab: TabId; onTabChange: (t: TabId) => void }) {
+function MobileLayout({ currentTab, onTabChange, lang, onLangChange }: { currentTab: TabId; onTabChange: (t: TabId) => void; lang: Lang; onLangChange: (l: Lang) => void }) {
   const [nameResult, setNameResult] = useState<any>(null);
   const [nameLoading, setNameLoading] = useState(false);
   const handleNameSubmit = async (data: { name: string; gender: '男' | '女' }) => {
@@ -72,33 +82,43 @@ function MobileLayout({ currentTab, onTabChange }: { currentTab: TabId; onTabCha
     setNameLoading(false);
   };
   return (
-    <div className="relative min-h-screen bg-[#0a0e1a] text-white font-sans">
-      <AtmosphericBg />
-      <header className="relative z-10 flex items-center justify-center py-4 px-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">☯</span>
-          <span className="font-serif text-amber-200 text-base">{TAB_TITLES[currentTab]}</span>
-        </div>
-      </header>
-      <main className="relative z-10 px-3 pb-24 max-w-md mx-auto">
-        {currentTab === 'report' && <FortuneReport />}
-        {currentTab === 'names' && (
-          nameLoading ? <div className="flex justify-center items-center min-h-[50vh]"><div className="text-amber-400/70 text-sm animate-pulse">☯ 姓名解析中...</div></div>
-          : nameResult ? <NameResult name={nameResult.name} score={nameResult} />
-          : <NameInputCard onSubmit={handleNameSubmit} />
-        )}
-        {currentTab === 'calendar' && <SelectDate />}
-        {currentTab === 'fengshui' && <FengShui />}
-        {currentTab === 'guanyin' && <Guanyin />}
-      </main>
-      <TabNav activeTab={currentTab} onTabChange={onTabChange} />
-      <DonationSidebar />
-    </div>
+    <LangContext.Provider value={lang}>
+      <div className="relative min-h-screen bg-[#0a0e1a] text-white font-sans">
+        <AtmosphericBg />
+        <header className="relative z-10 flex items-center justify-between py-4 px-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">☯</span>
+            <span className="font-serif text-amber-200 text-base">{tv(TAB_TITLES[currentTab], lang)}</span>
+          </div>
+          <button
+            onClick={() => onLangChange(lang === 'zh' ? 'en' : 'zh')}
+            className="flex items-center gap-1 text-xs text-amber-400/70 hover:text-amber-300 transition-colors"
+          >
+            <span className={lang === 'zh' ? 'text-amber-300 font-medium' : 'text-gray-500'}>中</span>
+            <span className="text-amber-800/40">|</span>
+            <span className={lang === 'en' ? 'text-amber-300 font-medium' : 'text-gray-500'}>EN</span>
+          </button>
+        </header>
+        <main className="relative z-10 px-3 pb-24 max-w-md mx-auto">
+          {currentTab === 'report' && <FortuneReport lang={lang} />}
+          {currentTab === 'names' && (
+            nameLoading ? <div className="flex justify-center items-center min-h-[50vh]"><div className="text-amber-400/70 text-sm animate-pulse">{tv({ zh: '☯ 姓名解析中...', en: '☯ Analyzing name...' }, lang)}</div></div>
+            : nameResult ? <NameResult name={nameResult.name} score={nameResult} lang={lang} />
+            : <NameInputCard onSubmit={handleNameSubmit} lang={lang} />
+          )}
+          {currentTab === 'calendar' && <SelectDate lang={lang} />}
+          {currentTab === 'fengshui' && <FengShui lang={lang} />}
+          {currentTab === 'guanyin' && <Guanyin lang={lang} />}
+        </main>
+        <TabNav activeTab={currentTab} onTabChange={onTabChange} lang={lang} />
+        <DonationSidebar lang={lang} />
+      </div>
+    </LangContext.Provider>
   );
 }
 
 // ─── Desktop Layout — each tab = one page ───
-function DesktopLayout({ currentTab, onTabChange }: { currentTab: TabId; onTabChange: (t: TabId) => void }) {
+function DesktopLayout({ currentTab, onTabChange, lang, onLangChange }: { currentTab: TabId; onTabChange: (t: TabId) => void; lang: Lang; onLangChange: (l: Lang) => void }) {
   const [nameResult, setNameResult] = useState<any>(null);
   const [nameLoading, setNameLoading] = useState(false);
 
@@ -113,64 +133,75 @@ function DesktopLayout({ currentTab, onTabChange }: { currentTab: TabId; onTabCh
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0a0e1a] text-white font-sans">
-      <AtmosphericBg />
-      <DonationSidebar />
+    <LangContext.Provider value={lang}>
+      <div className="relative min-h-screen bg-[#0a0e1a] text-white font-sans">
+        <AtmosphericBg />
+        <DonationSidebar lang={lang} />
 
-      {/* Top header */}
-      <header className="relative z-20 flex items-center justify-center py-4 px-6">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">☯</span>
-          <span className="font-serif text-amber-200 text-base">FortuneAI</span>
+        {/* Top header */}
+        <header className="relative z-20 flex items-center justify-between py-4 px-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">☯</span>
+            <span className="font-serif text-amber-200 text-base">FortuneAI</span>
+          </div>
+          <button
+            onClick={() => onLangChange(lang === 'zh' ? 'en' : 'zh')}
+            className="flex items-center gap-1 text-xs text-amber-400/70 hover:text-amber-300 transition-colors"
+          >
+            <span className={lang === 'zh' ? 'text-amber-300 font-medium' : 'text-gray-500'}>中</span>
+            <span className="text-amber-800/40">|</span>
+            <span className={lang === 'en' ? 'text-amber-300 font-medium' : 'text-gray-500'}>EN</span>
+          </button>
+        </header>
+
+        {/* Top tab nav — centered */}
+        <div className="relative z-20 flex justify-center px-4 mb-6">
+          <nav className="flex items-center gap-1 bg-[#0d1525]/90 backdrop-blur-md border border-amber-900/30 rounded-full px-2 py-1">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => { onTabChange(tab.id); setNameResult(null); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all ${
+                  currentTab === tab.id
+                    ? 'bg-amber-900/60 text-amber-300 border border-amber-700/40'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                <span>{tab.icon}</span>
+                <span>{tv(tab.label, lang)}</span>
+              </button>
+            ))}
+          </nav>
         </div>
-      </header>
 
-      {/* Top tab nav — centered */}
-      <div className="relative z-20 flex justify-center px-4 mb-6">
-        <nav className="flex items-center gap-1 bg-[#0d1525]/90 backdrop-blur-md border border-amber-900/30 rounded-full px-2 py-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => { onTabChange(tab.id); setNameResult(null); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all ${
-                currentTab === tab.id
-                  ? 'bg-amber-900/60 text-amber-300 border border-amber-700/40'
-                  : 'text-gray-400 hover:text-gray-200'
-              }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Content — centered */}
-      <div className="relative z-10 px-6 pb-8 flex justify-center">
-        <div className="w-full" style={{ maxWidth: '860px' }}>
-          {currentTab === 'report' && <FortuneReport />}
-          {currentTab === 'names' && (
-            nameLoading ? (
-              <div className="flex justify-center items-center min-h-[50vh]"><div className="text-amber-400/70 text-sm animate-pulse">☯ 姓名解析中...</div></div>
-            ) : nameResult ? (
-              <NameResult name={nameResult.name} score={nameResult} />
-            ) : (
-              <NameInputCard onSubmit={handleNameSubmit} />
-            )
-          )}
-          {currentTab === 'calendar' && <SelectDate />}
-          {currentTab === 'fengshui' && <FengShui />}
-          {currentTab === 'guanyin' && <Guanyin />}
+        {/* Content — centered */}
+        <div className="relative z-10 px-6 pb-8 flex justify-center">
+          <div className="w-full" style={{ maxWidth: '860px' }}>
+            {currentTab === 'report' && <FortuneReport lang={lang} />}
+            {currentTab === 'names' && (
+              nameLoading ? (
+                <div className="flex justify-center items-center min-h-[50vh]"><div className="text-amber-400/70 text-sm animate-pulse">{tv({ zh: '☯ 姓名解析中...', en: '☯ Analyzing name...' }, lang)}</div></div>
+              ) : nameResult ? (
+                <NameResult name={nameResult.name} score={nameResult} lang={lang} />
+              ) : (
+                <NameInputCard onSubmit={handleNameSubmit} lang={lang} />
+              )
+            )}
+            {currentTab === 'calendar' && <SelectDate lang={lang} />}
+            {currentTab === 'fengshui' && <FengShui lang={lang} />}
+            {currentTab === 'guanyin' && <Guanyin lang={lang} />}
+          </div>
         </div>
       </div>
-    </div>
+    </LangContext.Provider>
   );
 }
 
 export default function App() {
   const isMobile = useIsMobile();
   const [currentTab, setCurrentTab] = useState<TabId>('report');
+  const [lang, setLang] = useState<Lang>('zh');
   return isMobile
-    ? <MobileLayout currentTab={currentTab} onTabChange={setCurrentTab} />
-    : <DesktopLayout currentTab={currentTab} onTabChange={setCurrentTab} />;
+    ? <MobileLayout currentTab={currentTab} onTabChange={setCurrentTab} lang={lang} onLangChange={setLang} />
+    : <DesktopLayout currentTab={currentTab} onTabChange={setCurrentTab} lang={lang} onLangChange={setLang} />;
 }

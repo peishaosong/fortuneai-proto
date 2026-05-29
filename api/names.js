@@ -186,9 +186,14 @@ function analyzeName(name, gender) {
   const max = Math.max.apply(null, vals);
   const balance = (max <= 2 && vals.filter(function(v) { return v > 0; }).length >= 3) ? '均衡' : '偏颇';
 
-  // 综合评分
-  const score = Math.round(renge * 0.4 + tiange * 0.2 + dige * 0.2 + zongge * 0.2);
-  const total = Math.min(100, Math.max(0, score));
+  // 综合评分：五格平均，映射到100分制
+  // 五格数理范围1-81，映射到0-100：1-10映射50-100，11-81映射0-100
+  function normGrid(n) {
+    if (n <= 10) return Math.round(((n - 1) / 9) * 50 + 50); // 1-10 → 50-100
+    return Math.round(((81 - n) / 70) * 50); // 11-81 → 0-50
+  }
+  const allGrids = [tiange, dige, renge, zongge, waige];
+  const total = Math.round(allGrids.map(normGrid).reduce((a, b) => a + b, 0) / allGrids.length);
 
   const grade = total >= 90 ? '大吉' : total >= 80 ? '吉' : total >= 70 ? '中吉' : total >= 60 ? '中' : total >= 50 ? '平' : '凶';
   const gradeColor = total >= 80 ? '#4ade80' : total >= 60 ? '#fbbf24' : '#f87171';

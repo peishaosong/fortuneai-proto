@@ -2,12 +2,15 @@
  * FortuneAI 观音灵签页面
  */
 import { useState } from 'react';
+import { type Lang, tv, tf } from '../i18n';
+
+interface GuanyinProps {
+  lang?: Lang;
+}
 
 function generateSign(): { number: number; stem: string; text: string; level: string } {
   const num = Math.floor(Math.random() * 60) + 1;
-  const stems = [
-    '上上', '上吉', '中吉', '吉', '中平', '下吉', '下下',
-  ];
+  const stems = ['上上', '上吉', '中吉', '吉', '中平', '下吉', '下下'];
   const stemIdx = num <= 10 ? 0 : num <= 25 ? 1 : num <= 40 ? 2 : num <= 52 ? 3 : num <= 58 ? 5 : 6;
   const stem = stems[stemIdx];
 
@@ -48,7 +51,7 @@ function generateSign(): { number: number; stem: string; text: string; level: st
   return { number: num, stem, text, level: stem };
 }
 
-export function Guanyin() {
+export function Guanyin({ lang = 'zh' }: GuanyinProps) {
   const [step, setStep] = useState<'shake' | 'reveal'>('shake');
   const [sign, setSign] = useState<{ number: number; stem: string; text: string; level: string } | null>(null);
   const [shaking, setShaking] = useState(false);
@@ -88,25 +91,27 @@ export function Guanyin() {
   if (step === 'reveal' && sign) {
     const color = stemColors[sign.stem] || '#9ca3af';
     const bgGrad = stemBgColors[sign.stem] || 'from-gray-800/40 to-gray-900/20';
+    const stemLabel = tv({ zh: sign.stem, en: getStemEn(sign.stem) }, lang);
+    const signNum = lang === 'en' ? `No. ${sign.number}` : `第 ${sign.number} 签`;
 
     return (
       <div className="pb-16 animate-fade-in">
         <div className="text-center mb-4">
-          <div className="text-amber-600/60 text-xs">签筒已收 · 抽中第 {sign.number} 签</div>
+          <div className="text-amber-600/60 text-xs">{tv({ zh: '签筒已收 · 抽中第 ', en: 'Received · Drawn ' }, lang)}{sign.number}{tv({ zh: ' 签', en: '' }, lang)}</div>
         </div>
 
         <div className="fate-card rounded-2xl overflow-hidden mb-4">
           <div className={`bg-gradient-to-br ${bgGrad} px-6 py-5 text-center border-b border-amber-800/20`}>
             <div className="text-3xl mb-1">🔮</div>
             <div className="font-serif text-2xl font-bold mb-1" style={{ color }}>
-              {sign.stem}
+              {stemLabel}
             </div>
-            <div className="text-amber-200/70 text-sm">第 {sign.number} 签</div>
+            <div className="text-amber-200/70 text-sm">{signNum}</div>
           </div>
 
           <div className="px-6 py-5">
             <div className="text-[10px] text-amber-600/60 text-center mb-3 uppercase tracking-widest">
-              观音灵签 · 诗曰
+              {tv({ zh: '观音灵签 · 诗曰', en: 'Guanyin Divination · Poem' }, lang)}
             </div>
             <p className="text-center text-gray-300 leading-relaxed font-serif" style={{ fontSize: '0.95rem' }}>
               {sign.text}
@@ -116,30 +121,31 @@ export function Guanyin() {
           <div className="px-6 py-4 border-t border-amber-800/15">
             <button
               onClick={async () => {
+                const enMsg = lang === 'en'
+                  ? `I drew Guanyin Divination No. ${sign.number}, fortune level "${getStemEn(sign.stem)}". The poem reads: "${sign.text}". Please give me a detailed analysis including: 1) Overall fortune assessment 2) Guidance for your question 3) Remedies and precautions 4) Lucky directions/colors. Warm and friendly tone, use emoji.`
+                  : `我抽到了观音灵签第${sign.number}签，签运为"${sign.stem}"。签诗为："${sign.text}"。请帮我详细解读这个签的含义，包括：1）整体运势分析 2）求事解惑 3）趋避建议 4）适合的吉方位/颜色。请用亲切的口吻，善用emoji。`;
                 const resp = await fetch('/api/chat', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    message: `我抽到了观音灵签第${sign.number}签，签运为"${sign.stem}"。签诗为："${sign.text}"。请帮我详细解读这个签的含义，包括：1）整体运势分析 2）求事解惑 3）趋避建议 4）适合的吉方位/颜色。请用亲切的口吻，善用emoji。`,
-                  }),
+                  body: JSON.stringify({ message: enMsg, lang }),
                 });
                 const data = await resp.json();
                 const explanationEl = document.getElementById('sign-explanation');
                 if (explanationEl && data.reply) {
-                  explanationEl.innerHTML = `<div class="text-[10px] text-amber-600/60 uppercase tracking-widest mb-2 text-center">观音开示</div><p class="text-sm text-gray-300 leading-relaxed">${data.reply.replace(/\n/g, '<br/>')}</p>`;
+                  explanationEl.innerHTML = `<div class="text-[10px] text-amber-600/60 uppercase tracking-widest mb-2 text-center">${tv({ zh: '观音开示', en: 'Guanyin\'s Guidance' }, lang)}</div><p class="text-sm text-gray-300 leading-relaxed">${data.reply.replace(/\n/g, '<br/>')}</p>`;
                 }
               }}
               id="explain-btn"
               className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-900/40 to-amber-800/20 text-amber-300 text-sm border border-amber-700/30 hover:from-amber-900/60 hover:to-amber-800/40 transition-all"
             >
-              🙏 请观音菩萨指点
+              {tv({ zh: '🙏 请观音菩萨指点', en: '🙏 Ask Guanyin for Guidance' }, lang)}
             </button>
             <div
               id="sign-explanation"
               className="mt-3 p-3 rounded-xl bg-gray-900/50 border border-amber-800/15"
             >
               <div className="text-center text-amber-600/40 text-xs py-4">
-                点击上方按钮，获取详细解签
+                {tv({ zh: '点击上方按钮，获取详细解签', en: 'Tap the button above for detailed reading' }, lang)}
               </div>
             </div>
           </div>
@@ -149,19 +155,25 @@ export function Guanyin() {
           onClick={handleReset}
           className="w-full py-3 rounded-xl border border-amber-700/40 text-amber-400/70 text-sm hover:bg-amber-900/20 transition-all"
         >
-          🔮 再抽一签
+          {tv({ zh: '🔮 再抽一签', en: '🔮 Draw Another' }, lang)}
         </button>
       </div>
     );
   }
+
+  const notices = [
+    { zh: '心中默念所求之事，诚心摇动签筒', en: 'Mentally focus on your question, shake the tube devotionally' },
+    { zh: '摇至签筒发出声响，落出一签为止', en: 'Shake until a stick falls out with a sound' },
+    { zh: '抽得签文后，点击"请观音菩萨指点"获取详解', en: 'After drawing, tap "Ask Guanyin for Guidance" for full analysis' },
+  ];
 
   return (
     <div className="fate-portal">
       <div className="portal-glow-ring" />
       <div className="portal-header">
         <div className="portal-yin-yang">🔮</div>
-        <h1 className="portal-title">观音灵签</h1>
-        <p className="portal-subtitle">诚心摇一签，菩萨为您指点迷津</p>
+        <h1 className="portal-title">{tv({ zh: '观音灵签', en: 'Guanyin Divination' }, lang)}</h1>
+        <p className="portal-subtitle">{tv({ zh: '诚心摇一签，菩萨为您指点迷津', en: 'Shake devotionally for Guanyin\'s guidance' }, lang)}</p>
       </div>
       <div className="portal-divider">
         <div className="portal-divider-line" />
@@ -184,19 +196,19 @@ export function Guanyin() {
           </div>
         </div>
         <p className="text-amber-600/60 text-xs mt-4 text-center">
-          点击签筒 · 心念所求 · 诚心摇动
+          {tv({ zh: '点击签筒 · 心念所求 · 诚心摇动', en: 'Click the fortune stick · Focus your mind · Shake devotionally' }, lang)}
         </p>
         {shakeCount > 0 && (
-          <p className="text-amber-500/50 text-[10px] mt-1">已摇 {shakeCount} 次</p>
+          <p className="text-amber-500/50 text-[10px] mt-1">{tf(tv({ zh: '已摇 %d 次', en: 'Shaken %d times' }, lang), lang, shakeCount)}</p>
         )}
       </div>
 
       <div className="bg-gray-900/40 rounded-xl p-3 border border-amber-800/15 mb-4">
-        <div className="text-[10px] text-amber-600/70 uppercase tracking-widest text-center mb-2">摇签须知</div>
+        <div className="text-[10px] text-amber-600/70 uppercase tracking-widest text-center mb-2">{tv({ zh: '摇签须知', en: 'How to Draw' }, lang)}</div>
         <div className="space-y-1 text-xs text-gray-400">
-          <div>✦ 心中默念所求之事，诚心摇动签筒</div>
-          <div>✦ 摇至签筒发出声响，落出一签为止</div>
-          <div>✦ 抽得签文后，点击"请观音菩萨指点"获取详解</div>
+          {notices.map((n, i) => (
+            <div key={i}>✦ {tv(n, lang)}</div>
+          ))}
         </div>
       </div>
 
@@ -206,7 +218,7 @@ export function Guanyin() {
           disabled={shaking}
           className="portal-submit-btn disabled:opacity-40"
         >
-          <span className="portal-submit-text">{shaking ? '摇动中...' : '诚心摇签'}</span>
+          <span className="portal-submit-text">{shaking ? tv({ zh: '摇动中...', en: 'Shaking...' }, lang) : tv({ zh: '诚心摇签', en: 'Shake Devotionally' }, lang)}</span>
           <span className="portal-submit-arrow">🙏</span>
           <div className="portal-submit-shimmer" />
         </button>
@@ -218,4 +230,17 @@ export function Guanyin() {
       <div className="portal-corner portal-corner--br" />
     </div>
   );
+}
+
+function getStemEn(stem: string): string {
+  const map: Record<string, string> = {
+    '上上': 'Superior',
+    '上吉': 'Upper Auspicious',
+    '中吉': 'Moderately Auspicious',
+    '吉': 'Auspicious',
+    '中平': 'Moderate',
+    '下吉': 'Lower Auspicious',
+    '下下': 'Inauspicious',
+  };
+  return map[stem] || stem;
 }

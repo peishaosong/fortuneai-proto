@@ -304,9 +304,10 @@ async function apiHandler(req, res) {
     const message = sanitizeMessage(body.message);
     const bi = body.birth_info;
     const baziData = body.bazi_data;
+    const lang = body.lang === 'en' ? 'en' : 'zh';
 
     // P0: 消息校验
-    if (!message) return errorRes(res, 400, '请输入您的问题');
+    if (!message) return errorRes(res, 400, lang === 'en' ? 'Please enter your question' : '请输入您的问题');
 
     let userContent = message;
     if (baziData && bi) {
@@ -316,26 +317,22 @@ async function apiHandler(req, res) {
       const gods = baziData.gods || {};
       const dy = baziData.da_yun || [];
 
-      const baziDesc = `【命盘数据】出生：${bi.date || ''} ${bi.time || ''} ${bi.gender || ''}命
+      const baziDesc = lang === 'en'
+        ? `【Fate Chart】Birth: ${bi.date || ''} ${bi.time || ''} ${bi.gender || ''}命\n\nFour Pillars:\nYear: ${bz.year?.stem || ''}${bz.year?.branch || ''} | Hidden: ${(bz.year?.hidden || []).join('')}\nMonth: ${bz.month?.stem || ''}${bz.month?.branch || ''} | Hidden: ${(bz.month?.hidden || []).join('')}\nDay: ${bz.day?.stem || ''}${bz.day?.branch || ''} | Hidden: ${(bz.day?.hidden || []).join('')}\nHour: ${bz.hour?.stem || ''}${bz.hour?.branch || ''} | Hidden: ${(bz.hour?.hidden || []).join('')}\n\nFive Elements: Wood${wx.木||0} Fire${wx.火||0} Earth${wx.土||0} Metal${wx.金||0} Water${wx.水||0}\nDay Master: ${dm.stem || ''} (${dm.element || ''} energy, ${dm.strength || ''})\nUseful God: ${(gods.useful || []).join(', ')} | Avoid God: ${(gods.avoid || []).join(', ')}\n\nMajor Luck Cycles (first 5): ${dy.slice(0,5).map(d => `${d.age}yo ${d.stem}${d.branch} (${d.year})`).join(' | ') || 'N/A'}`
+        : `【命盘数据】出生：${bi.date || ''} ${bi.time || ''} ${bi.gender || ''}命\n\n四柱排盘：\n年柱：${bz.year?.stem || ''}${bz.year?.branch || ''} | 藏干：${(bz.year?.hidden || []).join('')}\n月柱：${bz.month?.stem || ''}${bz.month?.branch || ''} | 藏干：${(bz.month?.hidden || []).join('')}\n日柱：${bz.day?.stem || ''}${bz.day?.branch || ''} | 藏干：${(bz.day?.hidden || []).join('')}\n时柱：${bz.hour?.stem || ''}${bz.hour?.branch || ''} | 藏干：${(bz.hour?.hidden || []).join('')}\n\n五行分数：木${wx.木||0} 火${wx.火||0} 土${wx.土||0} 金${wx.金||0} 水${wx.水||0}\n日主：${dm.stem || ''}（${dm.element || ''}气，${dm.strength || ''}）\n用神：${(gods.useful || []).join('、')} | 忌神：${(gods.avoid || []).join('、')}\n\n大运（前5步）：${dy.slice(0,5).map(d => `${d.age}岁${d.stem}${d.branch}(${d.year}年)`).join(' | ') || '暂无'}`;
 
-四柱排盘：
-年柱：${bz.year?.stem || ''}${bz.year?.branch || ''} | 藏干：${(bz.year?.hidden || []).join('')}
-月柱：${bz.month?.stem || ''}${bz.month?.branch || ''} | 藏干：${(bz.month?.hidden || []).join('')}
-日柱：${bz.day?.stem || ''}${bz.day?.branch || ''} | 藏干：${(bz.day?.hidden || []).join('')}
-时柱：${bz.hour?.stem || ''}${bz.hour?.branch || ''} | 藏干：${(bz.hour?.hidden || []).join('')}
-
-五行分数：木${wx.木||0} 火${wx.火||0} 土${wx.土||0} 金${wx.金||0} 水${wx.水||0}
-日主：${dm.stem || ''}（${dm.element || ''}气，${dm.strength || ''}）
-用神：${(gods.useful || []).join('、')} | 忌神：${(gods.avoid || []).join('、')}
-
-大运（前5步）：${dy.slice(0,5).map(d => `${d.age}岁${d.stem}${d.branch}(${d.year}年)`).join(' | ') || '暂无'}`;
-
-      userContent = baziDesc + '\n\n请根据以上命盘数据，回答用户问题："' + message + '"。直接给出分析，不要问用户补充信息。';
+      userContent = lang === 'en'
+        ? baziDesc + '\n\nBased on the above fate chart data, answer the user\'s question: "' + message + '". Give direct analysis, do not ask for more info.'
+        : baziDesc + '\n\n请根据以上命盘数据，回答用户问题："' + message + '"。直接给出分析，不要问用户补充信息。';
     }
 
     try {
+      const SYSTEM_PROMPTS = {
+        zh: '你是一位精通八字命理的AI命理师。用户会提供命盘数据，你需要根据数据直接给出专业分析，不要要求用户提供更多信息。如果数据中有"暂无"或明显占位符，可以指出但仍要尽力分析。语气专业但亲切，善用emoji。',
+        en: 'You are an AI Feng Shui and BaZi master. Users provide fate chart data — analyze directly without asking for more info. If data shows "暂无" or placeholder, note it but still do your best analysis. Professional yet warm tone, use emoji.',
+      };
       const reply = await callLLM([
-        {role:'system', content:'你是一位精通八字命理的AI命理师。用户会提供命盘数据，你需要根据数据直接给出专业分析，不要要求用户提供更多信息。如果数据中有"暂无"或明显占位符，可以指出但仍要尽力分析。语气专业但亲切，善用emoji。'},
+        {role:'system', content: SYSTEM_PROMPTS[lang]},
         {role:'user', content: userContent}
       ]);
       return res.json({success:true, reply, intent: 'bazi'});
@@ -423,7 +420,7 @@ async function apiHandler(req, res) {
   if (path === '/api/agent') {
     const body = req.body || {};
     const message = (body.message || '').trim();
-    if (!message) return errorRes(res, 400, '请输入您的问题');
+    if (!message) return errorRes(res, 400, lang === 'en' ? 'Please enter your question' : '请输入您的问题');
     try {
       const lowerMsg = message.toLowerCase();
       let intent = 'chat';
