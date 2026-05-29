@@ -280,6 +280,7 @@ async function apiHandler(req, res) {
     try {
       const bazi = calculateBazi(y, m, d, timeStr, gender);
       const bz = bazi.ba_zi;
+      res.setHeader('X-Content-Type', 'application/json');
       return res.json({
         success: true,
         data: {
@@ -335,6 +336,7 @@ async function apiHandler(req, res) {
         {role:'system', content: SYSTEM_PROMPTS[lang]},
         {role:'user', content: userContent}
       ]);
+      res.setHeader('X-AI-Ready', 'true');
       return res.json({success:true, reply, intent: 'bazi'});
     } catch(e) {
       console.error('[chat] error:', e.message);

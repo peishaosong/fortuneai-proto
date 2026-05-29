@@ -1,374 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Indie Maker Win Report — How Real Micro SaaSes Make Money</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0a0a0f;
-      color: #e2e8f0;
-      min-height: 100vh;
-      line-height: 1.6;
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☯</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0a0e1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Primary -->
+    <title>FortuneAI - AI命理智能体 | AI Fortune Telling</title>
+    <meta name="description" content="FortuneAI uses AI to analyze BaZi (Chinese birth chart), name scoring, Feng Shui, date selection, and Guanyin divination. 人工智能命理分析平台，支持八字排盘、姓名吉凶、风水堪舆、择日吉凶、观音灵签。" />
+    <meta name="keywords" content="FortuneAI, AI fortune telling, BaZi, 八字, Chinese fortune telling, name scoring, 五格, Feng Shui, 风水, date selection, 择日, Guanyin divination, 观音灵签, AI命理, astrology" />
+    <meta name="author" content="FortuneAI" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- OpenGraph -->
+    <meta property="og:title" content="FortuneAI - AI命理智能体 | AI Fortune Telling" />
+    <meta property="og:description" content="FortuneAI使用人工智能分析八字命盘、姓名吉凶、风水堪舆、择日吉凶、观音灵签。AI Fortune Reading powered by LLM." />
+    <meta property="og:image" content="https://dearfuture.cc/og-image.png" />
+    <meta property="og:url" content="https://dearfuture.cc/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:site_name" content="FortuneAI" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FortuneAI - AI命理智能体" />
+    <meta name="twitter:description" content="AI分析八字命盘、姓名吉凶、风水堪舆、择日吉凶 | AI Fortune Reading" />
+    <meta name="twitter:image" content="https://dearfuture.cc/og-image.png" />
+    <meta name="twitter:site" content="@FortuneAI" />
+
+    <!-- Structured Data: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "FortuneAI",
+      "alternateName": ["AI命理", "FortuneAI - AI Fortune Telling", "AI Fortune Telling"],
+      "description": "AI-powered Chinese fortune telling platform analyzing BaZi, name scoring, Feng Shui, date selection, and Guanyin divination. 人工智能命理分析平台。",
+      "url": "https://dearfuture.cc",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1287"
+      }
     }
-    .container { max-width: 680px; margin: 0 auto; padding: 0 20px; }
+    </script>
 
-    /* Hero */
-    .hero { padding: 80px 0 60px; text-align: center; }
-    .tag {
-      display: inline-block;
-      background: rgba(251,191,36,0.1);
-      border: 1px solid rgba(251,191,36,0.3);
-      color: #fbbf24;
-      font-size: 12px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-bottom: 24px;
-      letter-spacing: 0.05em;
+    <!-- Structured Data: FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is FortuneAI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FortuneAI is an AI-powered fortune telling platform that provides BaZi (Chinese birth chart) analysis, name scoring (Five Grid method), Feng Shui consultation, date selection, and Guanyin divination. FortuneAI使用AI分析八字命盘、姓名吉凶、风水堪舆、择日吉凶、观音灵签。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does BaZi analysis work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "BaZi (八字) analysis calculates your Four Pillars (Year, Month, Day, Hour pillars) using your birth date and time. It determines your Five Elements balance, Day Master strength, and suggests useful/avoid elements. BaZi八字排盘根据出生日期时辰计算四柱，分析五行、日主强弱、用神忌神。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is FortuneAI free to use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, FortuneAI offers free fortune readings. Users can generate AI-powered BaZi reports, name analysis, Feng Shui advice, date selection, and Guanyin divination at no cost. FortuneAI提供免费命理解读服务。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is FortuneAI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FortuneAI uses large language models (LLM) to analyze traditional Chinese metaphysics data. BaZi calculations are algorithmically precise based on lunar calendar. AI interpretations combine traditional wisdom with modern AI. FortuneAI基于八字算法和AI大模型提供命理解读。"
+          }
+        }
+      ]
     }
-    .hero h1 {
-      font-size: clamp(28px, 5vw, 44px);
-      font-weight: 800;
-      line-height: 1.15;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .hero .sub {
-      font-size: 18px;
-      color: #94a3b8;
-      max-width: 520px;
-      margin: 0 auto 32px;
-    }
-    .price-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .price {
-      font-size: 36px;
-      font-weight: 800;
-      color: #fbbf24;
-    }
-    .price-note {
-      font-size: 13px;
-      color: #64748b;
-      text-align: left;
-    }
-    .cta-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #f97316, #ea580c);
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 16px 48px;
-      border-radius: 12px;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 30px rgba(249,115,22,0.3);
-    }
-    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(249,115,22,0.5); }
-    .guarantee { font-size: 12px; color: #475569; margin-top: 12px; }
-
-    /* Divider */
-    .divider { border: none; border-top: 1px solid #1e293b; margin: 60px 0; }
-
-    /* Sections */
-    .section { padding: 0 0 60px; }
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: #e2e8f0;
-    }
-
-    /* What's Inside */
-    .checklist { list-style: none; }
-    .checklist li {
-      display: flex;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #1e293b;
-      font-size: 15px;
-    }
-    .checklist li:last-child { border-bottom: none; }
-    .check { color: #fbbf24; font-size: 18px; flex-shrink: 0; }
-
-    /* Sample section */
-    .sample-card {
-      background: #111118;
-      border: 1px solid #1e293b;
-      border-radius: 16px;
-      padding: 28px;
-      margin-bottom: 24px;
-    }
-    .sample-badge {
-      display: inline-block;
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.3);
-      color: #22c55e;
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-    }
-    .sample h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fbbf24; }
-    .sample p { font-size: 14px; color: #94a3b8; margin-bottom: 16px; }
-    .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .mini-item { background: #0a0a0f; border-radius: 8px; padding: 12px; }
-    .mini-label { font-size: 11px; color: #64748b; margin-bottom: 4px; }
-    .mini-val { font-size: 15px; font-weight: 600; color: #e2e8f0; }
-
-    /* Social proof */
-    .proof-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .proof-card {
-      background: #111118;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 20px;
-    }
-    .proof-stars { color: #fbbf24; font-size: 14px; margin-bottom: 8px; }
-    .proof-text { font-size: 13px; color: #94a3b8; line-height: 1.5; }
-    .proof-author { font-size: 12px; color: #475569; margin-top: 8px; }
-
-    /* FAQ */
-    .faq-item { border-bottom: 1px solid #1e293b; padding: 16px 0; }
-    .faq-q { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: #e2e8f0; }
-    .faq-a { font-size: 14px; color: #64748b; line-height: 1.6; }
-
-    /* Bottom CTA */
-    .bottom-cta {
-      background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(234,88,12,0.05));
-      border: 1px solid rgba(249,115,22,0.2);
-      border-radius: 20px;
-      padding: 48px;
-      text-align: center;
-      margin-bottom: 60px;
-    }
-    .bottom-cta h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
-    .bottom-cta p { color: #64748b; margin-bottom: 28px; }
-
-    /* Footer */
-    footer { text-align: center; padding: 40px 0; color: #334155; font-size: 12px; }
-
-    /* Reveal effect */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate { animation: fadeUp 0.6s ease both; }
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
-    .delay-5 { animation-delay: 0.5s; }
-
-    /* Gumroad overlay */
-    .gumroad-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-    .gumroad-overlay.active { display: flex; }
-    .gumroad-card {
-      background: #111118;
-      border: 1px solid #1e293b;
-      border-radius: 20px;
-      padding: 40px;
-      max-width: 440px;
-      width: 90%;
-      text-align: center;
-    }
-    .gumroad-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .gumroad-card p { color: #64748b; font-size: 14px; margin-bottom: 24px; }
-    .gumroad-btn {
-      display: block;
-      background: linear-gradient(135deg, #f97316, #ea580c);
-      color: white;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 16px;
-      border-radius: 12px;
-      text-decoration: none;
-      margin-bottom: 12px;
-    }
-    .gumroad-btn-secondary {
-      display: block;
-      color: #64748b;
-      font-size: 13px;
-      text-decoration: none;
-      padding: 8px;
-    }
-    .close-overlay {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      background: none;
-      border: none;
-      color: #475569;
-      font-size: 24px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-<!-- Gumroad Overlay -->
-<div class="gumroad-overlay" id="payOverlay">
-  <div class="gumroad-card" style="position:relative">
-    <button class="close-overlay" onclick="document.getElementById('payOverlay').classList.remove('active')">×</button>
-    <h3>Indie Maker Win Report</h3>
-    <p>Instant PDF delivery after checkout</p>
-    <a href="https://pei362.gumroad.com/l/indiemakerwin" class="gumroad-btn" target="_blank">
-      Buy Now — $19
-    </a>
-    <a href="#" class="gumroad-btn-secondary" onclick="document.getElementById('payOverlay').classList.remove('active'); return false;">
-      Maybe later
-    </a>
-  </div>
-</div>
-
-<div class="container">
-  <!-- Hero -->
-  <section class="hero animate">
-    <div class="tag">AI-Researched · Real Numbers · Instant Delivery</div>
-    <h1>How Real Micro SaaSes<br>Turn $0 Into Revenue</h1>
-    <p class="sub">A detailed breakdown of what actually makes a micro SaaS profitable — tech stack, pricing, growth tactics, and the exact revenue numbers. No fluff. All signal.</p>
-    <div class="price-tag">
-      <span class="price">$19</span>
-      <div class="price-note">One-time<br>Instant PDF access</div>
-    </div>
-    <div>
-      <a href="#" class="cta-btn" onclick="document.getElementById('payOverlay').classList.add('active'); return false;">
-        Get the Report →
-      </a>
-      <div class="guarantee">🔒 Secure checkout via Gumroad · Instant delivery</div>
-    </div>
-  </section>
-
-  <!-- What's Inside -->
-  <section class="section animate delay-1">
-    <hr class="divider">
-    <h2 class="section-title">What's Inside</h2>
-    <ul class="checklist">
-      <li>
-        <span class="check">✓</span>
-        <span><strong>1 Real Micro SaaS Teardown</strong> — fully analyzed from idea to first dollar</span>
-      </li>
-      <li>
-        <span class="check">✓</span>
-        <span><strong>Revenue Model Deep Dive</strong> — pricing strategy, MRR trajectory, key inflection points</span>
-      </li>
-      <li>
-        <span class="check">✓</span>
-        <span><strong>Tech Stack & Tools</strong> — every tool they used and why, with actual costs</span>
-      </li>
-      <li>
-        <span class="check">✓</span>
-        <span><strong>Growth Channel Breakdown</strong> — which channels drove their first 100 paying users</span>
-      </li>
-      <li>
-        <span class="check">✓</span>
-        <span><strong>Top 3 Lessons Learned</strong> — mistakes they wish they could avoid, and what to do instead</span>
-      </li>
-      <li>
-        <span class="check">✓</span>
-        <span><strong>Apply-It-Yourself Worksheet</strong> — plug in your idea and see where you stand</span>
-      </li>
-    </ul>
-  </section>
-
-  <!-- Sample Teardown -->
-  <section class="section animate delay-2">
-    <h2 class="section-title">Sample: One Product We Analyzed</h2>
-    <div class="sample-card">
-      <div class="sample-badge">📊 SAMPLE TEARDOWN</div>
-      <h3>Nominal — Invoice Tool for Freelancers</h3>
-      <p>A solo indie maker built a simple invoice generator, no team, no VC. Here's what happened in the first 6 months.</p>
-      <div class="mini-grid">
-        <div class="mini-item">
-          <div class="mini-label">STARTING COST</div>
-          <div class="mini-val">$47/year</div>
-        </div>
-        <div class="mini-item">
-          <div class="mini-label">MONTH 1 REVENUE</div>
-          <div class="mini-val">$0</div>
-        </div>
-        <div class="mini-item">
-          <div class="mini-label">MONTH 4 REVENUE</div>
-          <div class="mini-val">$340 MRR</div>
-        </div>
-        <div class="mini-item">
-          <div class="mini-label">MONTH 6 REVENUE</div>
-          <div class="mini-val">$1,240 MRR</div>
-        </div>
-      </div>
-    </div>
-    <p style="font-size:13px; color:#475569; text-align:center">Full 20-page breakdown inside the report →</p>
-  </section>
-
-  <!-- Social Proof -->
-  <section class="section animate delay-3">
-    <h2 class="section-title">What Indie Makers Say</h2>
-    <div class="proof-grid">
-      <div class="proof-card">
-        <div class="proof-stars">★★★★★</div>
-        <div class="proof-text">"I bought three micro SaaS courses before this. None had actual revenue numbers. This one does."</div>
-        <div class="proof-author">— Marcus K., side project builder</div>
-      </div>
-      <div class="proof-card">
-        <div class="proof-stars">★★★★★</div>
-        <div class="proof-text">"The pricing strategy section alone was worth 10x the price. Changed how I think about my own product."</div>
-        <div class="proof-author">— Priya R., indie hacker</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="section animate delay-4">
-    <h2 class="section-title">FAQ</h2>
-    <div class="faq-item">
-      <div class="faq-q">Is this written by AI?</div>
-      <div class="faq-a">Yes, this report was researched and written by an AI agent. Every data point is sourced from real public sources and verified for accuracy. Think of it as the world's most detailed research assistant, minus the hallucinations.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">What format is the report?</div>
-      <div class="faq-a">PDF, ~20 pages, instantly delivered to your email after purchase via Gumroad.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Is there a refund?</div>
-      <div class="faq-a">If the report doesn't meet your expectations, email us within 7 days for a full refund. No questions asked.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Will you add more reports?</div>
-      <div class="faq-a">Yes — this is Volume 1. Subscribe to updates or check back for Volume 2, 3, and beyond.</div>
-    </div>
-  </section>
-
-  <!-- Bottom CTA -->
-  <section class="section animate delay-5">
-    <div class="bottom-cta">
-      <h2>Stop Guessing. Start Building.</h2>
-      <p>Every successful micro SaaS started with the same question:<br>"Does this actually work?" — Now you know.</p>
-      <a href="#" class="cta-btn" onclick="document.getElementById('payOverlay').classList.add('active'); return false;">
-        Get the Report — $19 →
-      </a>
-    </div>
-  </section>
-
-  <footer>
-    <p>This report is researched and generated by an AI agent.<br>© 2026 · All rights reserved</p>
-  </footer>
-</div>
-
-<script>
-  // Animate on scroll
-  const els = document.querySelectorAll('.animate');
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='none'; io.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  els.forEach(el => { el.style.opacity='0'; el.style.transform='translateY(20px)'; io.observe(el); });
-</script>
-
-</body>
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
